@@ -13,6 +13,8 @@ class Router
     public static \Twig\Environment $twig;
     public static function handle(): void
     {
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+        $dotenv->safeLoad();
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
         self::$twig = new \Twig\Environment($loader, [
             'cache' => __DIR__ . '/../cache'
@@ -40,7 +42,7 @@ class Router
     function lyrics(): void
     {
         if (!isset($_SESSION['spotify_session'])) {
-            header('Location: http://127.0.0.1:8080/callback');
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/callback');
         }
 
         /**
@@ -72,7 +74,7 @@ class Router
              */
             $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $id]);
 
-            if($lyrics == null) {
+            if ($lyrics == null) {
                 $lyrics = new Lyrics();
             }
 
@@ -149,23 +151,19 @@ class Router
         $lyrics->lyrics = $_POST['lyrics'];
         $entityManager->persist($lyrics);
         $entityManager->flush();
-        header('Location: http://127.0.0.1:8080/lyrics');
+        header('Location: ' . $_ENV['BASE_DOMAIN'] . '/lyrics');
     }
 
     function login(): string
     {
-
         if (!isset($_SESSION['spotify_session'])) {
-
-            $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-            $dotenv->safeLoad();
             $clientID = $_ENV['CLIENT_ID'];
             $clientSecret = $_ENV['CLIENT_SECRET'];
 
             $session = new Session(
                 $clientID,
                 $clientSecret,
-                'http://127.0.0.1:8080/callback'
+                $_ENV['BASE_DOMAIN'] . '/callback'
             );
 
             if (!isset($_GET['code'])) {
@@ -181,7 +179,7 @@ class Router
 
                 $_SESSION['spotify_session'] = $session;
 
-                header('Location: http://127.0.0.1:8080/lyrics');
+                header('Location: ' . $_ENV['BASE_DOMAIN'] . '/lyrics');
 
                 return "nice";
 
