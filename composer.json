@@ -16,6 +16,8 @@
         "phpstan/phpstan": "^2.1"
     },
     "require": {
-        "pecee/simple-router": "^5.4"
+        "pecee/simple-router": "^5.4",
+        "jwilsson/spotify-web-api-php": "^6.2",
+        "vlucas/phpdotenv": "^5.6"
     }
 }
