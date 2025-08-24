@@ -44,7 +44,7 @@ class Router
         }
 
         /**
-         * @var Session
+         * @var Session|null
          */
         $session = $_SESSION['spotify_session'];
 
@@ -67,7 +67,14 @@ class Router
             echo $id;
             $entityManager = DoctrineRegistry::get();
 
+            /**
+             * @var Lyrics|null
+             */
             $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $id]);
+
+            if($lyrics == null) {
+                $lyrics = new Lyrics();
+            }
 
             $template = self::$twig->load('lyrics.twig');
             var_dump($info->progress_ms / $info->item->duration_ms);
@@ -112,9 +119,12 @@ class Router
         $em = DoctrineRegistry::get();
 
         /**
-         * @var Lyrics
+         * @var Lyrics|null
          */
         $lyrics = $em->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $trackId]);
+        if ($lyrics == null) {
+            $lyrics = new Lyrics();
+        }
 
         echo $template->render([
             'song' => [

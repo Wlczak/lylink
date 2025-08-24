@@ -15,11 +15,11 @@ class Lyrics
     // @phpstan-ignore property.unusedType
     private int|null $id = null;
 
-    #[ORM\Column(type: 'string', unique: true)]    
+    #[ORM\Column(type: 'string', unique: true)]
     public string $spotify_id;
 
     #[ORM\Column(type: 'string')]
-    public string $lyrics;
+    public string $lyrics = "";
 
     /**
      * @return int|null

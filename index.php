@@ -6,8 +6,10 @@ use Lylink\Router;
 
 session_start();
 
-try{
-Router::handle();
-}catch (Exception $e){
+// phpinfo();
+
+try {
+    Router::handle();
+} catch (Exception $e) {
     echo $e;
 }
