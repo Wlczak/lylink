@@ -37,4 +37,4 @@ jobs:
             - name: Run PHPStan
               run:
                   ./vendor/bin/phpstan analyse --memory-limit 4G -c phpstan.neon --autoload-file
-                  vendor/autoload.php --error-format=gitlab src bin >> phpstan-result.json
+                  vendor/autoload.php --error-format=gitlab src bin
