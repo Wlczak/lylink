@@ -41,7 +41,7 @@
                             </div>
                         </div>
                     </div>
-
+                    {% if song.id != 0 %}
                     <div class="content">
                         <h3 class="title is-6">Lyrics</h3>
                         <div class="content">
@@ -53,6 +53,7 @@
                     <div class="content">
                         <a class="button is-link" href="/edit?id={{ song.id }}">Edit</a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
