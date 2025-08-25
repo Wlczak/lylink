@@ -19,7 +19,8 @@
                     <div class="media">
                         <div class="media-left">
                             <figure style="border-radius: 12px;" class="image is-128x128 has-background-grey-lighter">
-                                <img style="border-radius: 12px;" class="image is-128x128" src="{{ song.imageUrl }}" alt="{{ song.name }} cover">
+                                <img style="border-radius: 12px;" class="image is-128x128" src="{{ song.imageUrl }}"
+                                    alt="{{ song.name }} cover">
                             </figure>
                         </div>
                         <div class="media-content">
@@ -76,7 +77,7 @@
         document.querySelector('#progress-time').textContent = cur_min.toString().padStart(2, '0') + ':' + cur_sec.toString().padStart(2, '0');
 
         if (progress >= duration) {
-         window.location.reload();
+            window.location.reload();
         }
     }, 1000);
 </script>
