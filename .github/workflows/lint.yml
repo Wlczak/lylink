@@ -15,7 +15,7 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Install Composer 
-              run: wget https://raw.githubusercontent.com/composer/getcomposer.org/f3108f64b4e1c1ce6eb462b159956461592b3e3e/web/installer -O - -q | php -- --quiet
+              run: curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
             - name: Validate composer.json and composer.lock
               run: composer validate --strict
