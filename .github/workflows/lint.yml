@@ -14,8 +14,10 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Install Composer 
-              run: curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+            - name: Install Composer
+              run:
+                  curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
+                  --filename=composer
 
             - name: Validate composer.json and composer.lock
               run: composer validate --strict
@@ -28,7 +30,11 @@ jobs:
                   key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-interaction
+
             - name: Run PHPStan
-              run: |
-                  composer install
-                  ./vendor/bin/phpstan analyse --memory-limit 4G -c phpstan.neon --autoload-file vendor/autoload.php --error-format=gitlab src bin >> phpstan-result.json
+              run:
+                  ./vendor/bin/phpstan analyse --memory-limit 4G -c phpstan.neon --autoload-file
+                  vendor/autoload.php --error-format=gitlab src bin >> phpstan-result.json
