@@ -101,7 +101,8 @@ class Router
                 'duration_ms' => 0,
                 'progress_ms' => 0,
                 'imageUrl' => $_ENV['BASE_DOMAIN'] . '/img/albumPlaceholer.svg',
-                'id' => 0
+                'id' => 0,
+                'is_playing' => "false"
             ];
 
             echo $template = self::$twig->load('lyrics.twig')->render([
@@ -137,7 +138,8 @@ class Router
                 'duration_ms' => $info->item->duration_ms,
                 'progress_ms' => $info->progress_ms,
                 'imageUrl' => $info->item->album->images[0]->url,
-                'id' => $info->item->id
+                'id' => $info->item->id,
+                'is_playing' => $info->is_playing
             ];
             echo $template->render(
                 [

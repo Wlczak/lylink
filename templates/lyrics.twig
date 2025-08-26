@@ -27,7 +27,7 @@
                             <p class="title is-4">{{ song.name }}</p>
                             <p class="subtitle is-6">{{ song.artist }}</p>
 
-                            <progress class="progress is-primary" value="{{ progressPercent }}"
+                            <progress class="progress {{ song.is_playing ? 'is-primary' : 'is-warning' }}" value="{{ progressPercent }}"
                                 max="100">{{ progressPercent }}%</progress>
 
                             {% set current = (song.duration * progressPercent) / 100 %}
@@ -76,19 +76,21 @@
     eval(`
     duration = {{ song.duration_ms }};
     progress = {{ song.progress_ms }};
+    playing = {{ song.is_playing ? "true" : "false" }};
     `);
+    if (playing) {
+        setInterval(() => {
+            progress += 1000;
+            progressPercent = (progress / duration) * 100;
+            document.querySelector('.progress').value = progressPercent;
 
-    setInterval(() => {
-        progress += 1000;
-        progressPercent = (progress / duration) * 100;
-        document.querySelector('.progress').value = progressPercent;
+            cur_min = Math.floor((progress / 1000) / 60);
+            cur_sec = Math.floor((progress / 1000) - (cur_min * 60));
+            document.querySelector('#progress-time').textContent = cur_min.toString().padStart(2, '0') + ':' + cur_sec.toString().padStart(2, '0');
 
-        cur_min = Math.floor((progress / 1000) / 60);
-        cur_sec = Math.floor((progress / 1000) - (cur_min * 60));
-        document.querySelector('#progress-time').textContent = cur_min.toString().padStart(2, '0') + ':' + cur_sec.toString().padStart(2, '0');
-
-        if (progress >= duration) {
-            window.location.reload();
-        }
-    }, 1000);
+            if (progress >= duration) {
+                window.location.reload();
+            }
+        }, 1000);
+    }
 </script>
