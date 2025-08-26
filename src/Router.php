@@ -31,6 +31,7 @@ class Router
         SimpleRouter::get('/ping', function () {
             return "pong";
         });
+        SimpleRouter::get('/info', [self::class, 'info']);
         SimpleRouter::error(function ($request, $e) {
             http_response_code(404);
 
@@ -258,5 +259,52 @@ class Router
         $api = new SpotifyWebAPI();
 
         return "";
+    }
+
+    function info(): string
+    {
+        if (!isset($_SESSION['spotify_session'])) {
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/callback');
+            die();
+        }
+        /**
+         * @var Session|null
+         */
+        $session = $_SESSION['spotify_session'];
+
+        if ($session == null) {
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/callback');
+            die();
+        }
+
+        $api = new SpotifyWebAPI();
+        $api->setAccessToken($session->getAccessToken());
+
+        /**
+         * @var PlaybackInfo|null
+         */
+        $info = $api->getMyCurrentPlaybackInfo();
+
+        if ($info == null) {
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/callback');
+            die();
+        }
+        if ($info->item == null) {
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/callback');
+            die();
+        }
+
+        $song = [
+            'name' => $info->item->name,
+            'artist' => $info->item->artists[0]->name,
+            'duration' => $info->item->duration_ms / 1000,
+            'duration_ms' => $info->item->duration_ms,
+            'progress_ms' => $info->progress_ms,
+            'imageUrl' => $info->item->album->images[0]->url,
+            'id' => $info->item->id,
+            'is_playing' => $info->is_playing
+        ];
+
+        return json_encode($song) ?: "{}";
     }
 }

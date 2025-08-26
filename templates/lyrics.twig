@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Song — Demo</title>
+    <title>LyLink — {{ song.name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.4/css/bulma.min.css" />
 </head>
 
@@ -27,8 +27,9 @@
                             <p class="title is-4">{{ song.name }}</p>
                             <p class="subtitle is-6">{{ song.artist }}</p>
 
-                            <progress class="progress {{ song.is_playing ? 'is-primary' : 'is-warning' }}" value="{{ progressPercent }}"
-                                max="100">{{ progressPercent }}%</progress>
+                            <progress id="progress-bar"
+                                class="progress {{ song.is_playing ? 'is-primary' : 'is-warning' }}"
+                                value="{{ progressPercent }}" max="100">{{ progressPercent }}%</progress>
 
                             {% set current = (song.duration * progressPercent) / 100 %}
                             {% set cur_min = (current / 60)|round(0, 'floor') %}
@@ -77,20 +78,49 @@
     duration = {{ song.duration_ms }};
     progress = {{ song.progress_ms }};
     playing = {{ song.is_playing ? "true" : "false" }};
+    song_id = "{{ song.id }}";
     `);
+    interval = 0;
+    function updateProgress() {
+        progress += 1000;
+        progressPercent = (progress / duration) * 100;
+        document.querySelector('.progress').value = progressPercent;
+
+        cur_min = Math.floor((progress / 1000) / 60);
+        cur_sec = Math.floor((progress / 1000) - (cur_min * 60));
+        document.querySelector('#progress-time').textContent = cur_min.toString().padStart(2, '0') + ':' + cur_sec.toString().padStart(2, '0');
+
+        if (progress >= duration) {
+            window.location.reload();
+        }
+
+    }
     if (playing) {
-        setInterval(() => {
-            progress += 1000;
-            progressPercent = (progress / duration) * 100;
-            document.querySelector('.progress').value = progressPercent;
-
-            cur_min = Math.floor((progress / 1000) / 60);
-            cur_sec = Math.floor((progress / 1000) - (cur_min * 60));
-            document.querySelector('#progress-time').textContent = cur_min.toString().padStart(2, '0') + ':' + cur_sec.toString().padStart(2, '0');
-
-            if (progress >= duration) {
+        interval = setInterval(updateProgress, 1000);
+    }
+    setInterval(() => {
+        fetch('/info', { method: 'GET' }).then(response => response.json()).then(data => {
+            console.log(data);
+            if (data.id != song_id) {
                 window.location.reload();
             }
-        }, 1000);
-    }
+            progress = data.progress_ms;
+            updateProgress();
+            if (data.is_playing != playing) {
+                progress_bar = document.getElementById('progress-bar');
+                if (playing == true) {
+                    clearInterval(interval);
+                    progress_bar.classList.remove('is-primary');
+                    progress_bar.classList.add('is-warning');
+                    playing = false;
+                } else {
+                    interval = setInterval(updateProgress, 1000);
+                    progress_bar.classList.remove('is-warning');
+                    progress_bar.classList.add('is-primary');
+                    playing = true;
+                }
+            }
+        });
+    }, 5000);
+
 </script>
