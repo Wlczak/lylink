@@ -1,14 +1,21 @@
+FROM composer:latest AS composer
+
+WORKDIR /var/www/html
+
+COPY ./ /var/www/html
+
+RUN composer install
+
 FROM php:8.4-alpine
 
 WORKDIR /var/www/html
 
-
 RUN apk update && apk upgrade
-    # apk add --no-cache \
-    # php php-fpm php-session php-mbstring php-json php-curl php-ctype \
-    # php-tokenizer php-phar php-xml php-zip php-opcache php-fileinfo \
-    # php-pdo_sqlite
+# apk add --no-cache \
+# php php-fpm php-session php-mbstring php-json php-curl php-ctype \
+# php-tokenizer php-phar php-xml php-zip php-opcache php-fileinfo \
+# php-pdo_sqlite
 
-COPY ./ /var/www/html
+COPY --from=composer /var/www/html /var/www/html
 
 # CMD ["sh", "-c", "php-fpm8 -F & nginx -g 'daemon off;'"]
