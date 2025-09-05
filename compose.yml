@@ -6,6 +6,7 @@ services:
     volumes:
       # - ./:/var/www/html # For local development
       - ./lyrics.db:/var/www/html/lyrics.db
+      - ./.env:/var/www/html/.env
     ports:
       - "1592:80"
     command: ["php", "-S", "0.0.0.0:80", "-t", "/var/www/html/public_html"]
