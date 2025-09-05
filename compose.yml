@@ -16,4 +16,4 @@ services:
 
 networks:
   lylink-net:
-    name: lylink-net
+    driver: bridge
