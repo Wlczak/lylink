@@ -4,12 +4,12 @@ declare (strict_types = 1);
 namespace Lylink;
 
 use Dotenv\Dotenv;
+use Lylink\Interfaces\Datatypes\PlaybackInfo;
+use Lylink\Interfaces\Datatypes\Track;
 use Pecee\SimpleRouter\SimpleRouter;
-use PlaybackInfo;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
 use SpotifyWebAPI\SpotifyWebAPIException;
-use Track;
 
 class Router
 {
