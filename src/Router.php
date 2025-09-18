@@ -23,8 +23,8 @@ class Router
             'cache' => __DIR__ . '/../cache',
             'debug' => true
         ]);
-        #SimpleRouter::get('/', [self::class, 'home']);
-        SimpleRouter::redirect('/', $_ENV['BASE_DOMAIN'] . '/lyrics', 307);
+        SimpleRouter::get('/', [self::class, 'home']);
+        // SimpleRouter::redirect('/', $_ENV['BASE_DOMAIN'] . '/login', 307);
         SimpleRouter::get('/callback', [self::class, 'login']);
         SimpleRouter::get('/lyrics', [self::class, 'lyrics']);
         SimpleRouter::get('/edit', [self::class, 'edit']);
@@ -50,11 +50,7 @@ class Router
 
     public static function home(): string
     {
-        if (!isset($_SESSION['spotify_session'])) {
-            return "not logged in";
-        } else {
-            return "logged in";
-        }
+        return self::$twig->load('home.twig')->render();
     }
 
     function lyrics(): void
