@@ -112,19 +112,20 @@
             }
 
             var services = [
-                { id: 'spotify', label: 'Continue with Spotify', href: '/auth/spotify', classes: 'is-success' },
-                { id: 'jellyfin', label: 'Continue with Jellyfin', href: '/auth/jellyfin', classes: 'is-info' }
+                { id: 'spotify', label: 'Continue with Spotify', href: '/auth/spotify', classes: 'is-success', enabled: false },
+                { id: 'jellyfin', label: 'Continue with Jellyfin', href: '/auth/jellyfin', classes: 'is-info', enabled: false },
             ];
 
             var container = document.getElementById('service-buttons');
             services.forEach(function (s) {
                 var a = document.createElement('a');
                 a.className = 'button ' + s.classes;
-                a.href = s.href;
+                if (s.enabled) a.href = s.href;
                 a.textContent = s.label;
                 a.setAttribute('data-service', s.id);
                 a.setAttribute('role', 'button');
                 a.style.minWidth = '220px';
+                if (!s.enabled) a.classList.add('is-disabled'); a.toggleAttribute('disabled', !s.enabled);
                 container.appendChild(a);
             });
 
