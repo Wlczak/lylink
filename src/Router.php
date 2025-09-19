@@ -6,6 +6,8 @@ namespace Lylink;
 use Dotenv\Dotenv;
 use Lylink\Interfaces\Datatypes\PlaybackInfo;
 use Lylink\Interfaces\Datatypes\Track;
+use Lylink\Models\Lyrics;
+use Lylink\Models\User;
 use Pecee\SimpleRouter\SimpleRouter;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
@@ -27,14 +29,18 @@ class Router
         ## User facing routes ##
         SimpleRouter::get('/', [self::class, 'home']);
         // SimpleRouter::redirect('/', $_ENV['BASE_DOMAIN'] . '/login', 307);
-        SimpleRouter::get('/lyrics', [self::class, 'lyrics']);
-        SimpleRouter::get('/edit', [self::class, 'edit']);
+
+        SimpleRouter::group(['middleware' => \Lylink\Middleware\AuthMiddleware::class], function () {
+            SimpleRouter::get('/lyrics', [self::class, 'lyrics']);
+            SimpleRouter::get('/edit', [self::class, 'edit']);
+        });
 
         SimpleRouter::get('/login', [self::class, 'login']);
         SimpleRouter::get('/register', [self::class, 'register']);
+        SimpleRouter::post('/register', [self::class, 'registerPost']);
 
         ## Technical / api routes ##
-        SimpleRouter::get('/callback', [self::class, 'spotify']); ## Spotify login
+        SimpleRouter::get('/callback', [self::class, 'spotify']);
         SimpleRouter::get('/ping', function () {
             return "pong";
         });
@@ -67,6 +73,27 @@ class Router
 
     public static function register(): string
     {
+        return self::$twig->load('register.twig')->render();
+    }
+
+    public static function registerPost(): string
+    {
+        $email = $_POST["email"];
+        $username = $_POST["username"];
+
+        $pass = $_POST["password"];
+        $passCheck = $_POST["password_confirm"];
+
+        if ($pass != $passCheck) {
+            throw new \Exception("Passwords do not match");
+        }
+
+        $em = DoctrineRegistry::get();
+        $user = new User($email, $username, password_hash($pass, PASSWORD_BCRYPT));
+
+        $em->persist($user);
+        $em->flush();
+
         return self::$twig->load('register.twig')->render();
     }
 
