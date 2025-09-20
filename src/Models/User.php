@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
 
+# Id | username | email | pasword | spotify id | allow spotify login | jellyfin account id | allow jellyfin login |||
+
 class User
 {
     #[ORM\Id]
@@ -19,10 +21,22 @@ class User
     public string $username;
 
     #[ORM\Column(type: 'string')]
-    private string $email = "";
+    private string $email;
 
     #[ORM\Column(type: 'string')]
-    private string $password = "";
+    private string $password;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    public string $spotifyId = "";
+
+    #[ORM\Column(type: 'boolean')]
+    public bool $allowSpotifyLogin = false;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    public string $jellyfinAccountId = "";
+
+    #[ORM\Column(type: 'boolean')]
+    public bool $allowJellyfinLogin = false;
 
     /**
      * @return int|null

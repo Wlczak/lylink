@@ -8,7 +8,7 @@ use Lylink\DoctrineRegistry;
 require_once __DIR__ . '/vendor/autoload.php';
                                                           // Create a simple "default" Doctrine ORM configuration for Attributes
 $config = ORMSetup::createAttributeMetadataConfiguration( // on PHP < 8.4, use ORMSetup::createAttributeMetadataConfiguration()
-    paths: [__DIR__ . '/src'],
+    paths: [__DIR__ . '/src/Models'],
     isDevMode: true,
 );
 
