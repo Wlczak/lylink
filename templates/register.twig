@@ -50,7 +50,13 @@
                             </ul>
                         </div>
                         {% endif %}
-
+                        {% if success is defined and success %}
+                        <div class="notification is-success">
+                            <button class="delete" onclick="this.parentElement.remove()"></button>
+                            <strong>Account created!</strong>
+                            <p>Your account has been created successfully. You can <a href="/login">log in now</a>.</p>
+                        </div>
+                        {% else %}
                         <form id="register-form" action="/register" method="POST" autocomplete="on" novalidate>
                             <div class="field">
                                 <label class="label">Username</label>
@@ -111,6 +117,8 @@
 
 
                         <!-- <p class="has-text-centered is-size-7">By creating an account you agree to our terms.</p> -->
+                        {% endif %}
+
                     </div>
                 </div>
             </div>
