@@ -3,13 +3,16 @@ declare (strict_types = 1);
 
 namespace Lylink;
 
+use Lylink\Auth\AuthSession;
 use Dotenv\Dotenv;
+use Lylink\Auth\DefaultAuth;
+use Lylink\Interfaces\Datatypes\PlaybackInfo;
+use Lylink\Interfaces\Datatypes\Track;
+use Lylink\Models\Lyrics;
 use Pecee\SimpleRouter\SimpleRouter;
-use PlaybackInfo;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
 use SpotifyWebAPI\SpotifyWebAPIException;
-use Track;
 
 class Router
 {
@@ -23,11 +26,28 @@ class Router
             'cache' => __DIR__ . '/../cache',
             'debug' => true
         ]);
-        #SimpleRouter::get('/', [self::class, 'home']);
-        SimpleRouter::redirect('/', $_ENV['BASE_DOMAIN'] . '/lyrics', 307);
-        SimpleRouter::get('/callback', [self::class, 'login']);
-        SimpleRouter::get('/lyrics', [self::class, 'lyrics']);
-        SimpleRouter::get('/edit', [self::class, 'edit']);
+
+        ## User facing routes ##
+        SimpleRouter::get('/', [self::class, 'home']);
+        // SimpleRouter::redirect('/', $_ENV['BASE_DOMAIN'] . '/login', 307);
+
+        ## Authenticated routes ##
+        SimpleRouter::group(['middleware' => \Lylink\Middleware\AuthMiddleware::class], function () {
+            SimpleRouter::get('/lyrics', [self::class, 'lyrics']);
+            SimpleRouter::get('/edit', [self::class, 'edit']);
+        });
+
+        SimpleRouter::get('/login', [self::class, 'login']);
+        SimpleRouter::post('/login', [self::class, 'loginPost']);
+        SimpleRouter::get('/register', [self::class, 'register']);
+        SimpleRouter::post('/register', [self::class, 'registerPost']);
+        SimpleRouter::get('/logout', function () {
+            AuthSession::logout();
+            header('Location: ' . $_ENV['BASE_DOMAIN']);
+        });
+
+        ## Technical / api routes ##
+        SimpleRouter::get('/callback', [self::class, 'spotify']);
         SimpleRouter::get('/ping', function () {
             return "pong";
         });
@@ -50,11 +70,46 @@ class Router
 
     public static function home(): string
     {
-        if (!isset($_SESSION['spotify_session'])) {
-            return "not logged in";
-        } else {
-            return "logged in";
-        }
+        return self::$twig->load('home.twig')->render([
+            'user' => AuthSession::get()
+        ]);
+    }
+
+    public static function login(): string
+    {
+        return self::$twig->load('login.twig')->render();
+    }
+
+    public static function loginPost(): string
+    {
+        $username = trim($_POST['username'] ?? '');
+        $pass = $_POST['password'] ?? '';
+
+        $auth = new DefaultAuth();
+        $data = $auth->login($username, $pass);
+
+        AuthSession::set($auth);
+
+        return self::$twig->load('login.twig')->render($data);
+    }
+
+    public static function register(): string
+    {
+        return self::$twig->load('register.twig')->render();
+    }
+
+    public static function registerPost(): string
+    {
+
+        $email = trim($_POST['email'] ?? '');
+        $username = trim($_POST['username'] ?? '');
+        $pass = $_POST['password'] ?? '';
+        $passCheck = $_POST['password_confirm'] ?? '';
+
+        $auth = new DefaultAuth();
+        $data = $auth->register($email, $username, $pass, $passCheck);
+
+        return self::$twig->load('register.twig')->render($data);
     }
 
     function lyrics(): void
@@ -205,7 +260,7 @@ class Router
         header('Location: ' . $_ENV['BASE_DOMAIN'] . '/lyrics');
     }
 
-    function login(): string
+    function spotify(): string
     {
         if (isset($_SESSION['spotify_session'])) {
             /**
