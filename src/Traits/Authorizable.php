@@ -6,7 +6,7 @@ trait Authorizable
 {
     public function isAuthorized(): bool
     {
-        return true;
+        return $this->authorized;
     }
 
     private bool $authorized;

@@ -9,4 +9,5 @@ interface Authorizator
      */
     public function login(string $usernamemail, string $password): array;
     public function logout(): void;
+    public function isAuthorized(): bool;
 }

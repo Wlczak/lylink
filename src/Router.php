@@ -31,6 +31,7 @@ class Router
         SimpleRouter::get('/', [self::class, 'home']);
         // SimpleRouter::redirect('/', $_ENV['BASE_DOMAIN'] . '/login', 307);
 
+        ## Authenticated routes ##
         SimpleRouter::group(['middleware' => \Lylink\Middleware\AuthMiddleware::class], function () {
             SimpleRouter::get('/lyrics', [self::class, 'lyrics']);
             SimpleRouter::get('/edit', [self::class, 'edit']);
