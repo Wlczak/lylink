@@ -4,7 +4,6 @@ namespace Lylink\Interfaces\Auth;
 
 interface Authorizator
 {
-    public function isAuthorized(): bool;
     /**
      * @return array{errors: list<string>, success: bool, usermail: string}
      */

@@ -6,14 +6,12 @@ use Lylink\DoctrineRegistry;
 use Lylink\Interfaces\Auth\AccountHandler;
 use Lylink\Interfaces\Auth\Authorizator;
 use Lylink\Models\User;
+use Lylink\Traits\Authorizable;
 
 class DefaultAuth implements Authorizator, AccountHandler
 {
-    public function isAuthorized(): bool
-    {
-        return true;
-    }
-
+    use Authorizable;
+    
     /**
      * @return array{errors: list<string>, success: bool, usermail: string}
      */
@@ -48,6 +46,7 @@ class DefaultAuth implements Authorizator, AccountHandler
 
         if ($data["errors"] === []) {
             $data["success"] = true;
+            $this->authorized = true;
         }
         return $data;
     }
