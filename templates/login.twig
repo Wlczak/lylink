@@ -39,12 +39,33 @@
                 <div class="column is-6-tablet is-5-desktop is-4-widescreen">
                     <div class="box">
                         <h1 class="title is-4 has-text-centered">Login to LyLink</h1>
+                        {% if errors is defined and errors %}
+                        <div class="notification is-danger">
+                            <button class="delete" onclick="this.parentElement.remove()"></button>
+                            <strong>There were errors with your submission:</strong>
+                            <ul>
+                                {% for err in errors %}
+                                <li>{{ err }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if success is defined and success %}
+                        <div class="notification is-success">
+                            <button class="delete" onclick="this.parentElement.remove()"></button>
+                            <strong>Login successful!</strong>
+                            <p>You have been logged in. <a href="/dashboard">Go to your dashboard</a>.</p>
+                        </div>
+                        {% endif %}
+
                         <form id="login-form" action="/login" method="POST" autocomplete="on">
                             <div class="field">
                                 <label class="label">Email or Username</label>
                                 <div class="control">
                                     <input class="input" type="text" name="username" id="username"
-                                        placeholder="you@example.com or username" required />
+                                        placeholder="you@example.com or username" required
+                                        value="{{ old.username|default('')|e }}" />
                                 </div>
                             </div>
 
@@ -53,7 +74,6 @@
                                 <div class="control has-icons-right">
                                     <input class="input" type="password" name="password" id="password"
                                         placeholder="Your password" required />
-                                    <!-- <span id="toggle-password" class="icon is-small is-right" style="cursor:progress; user-select:none">👁️</span> -->
                                 </div>
                             </div>
 
@@ -61,9 +81,6 @@
                                 <div class="field-body">
                                     <div class="field">
                                         <div class="control">
-                                            <!-- <label class="checkbox"> -->
-                                                <!-- <input type="checkbox" name="remember" /> Remember me -->
-                                            <!-- </label> -->
                                         </div>
                                     </div>
                                     <div class="field has-text-right">
@@ -92,12 +109,12 @@
                         <div class="has-text-centered" style="margin-top:0.75rem">
                             <a class="is-size-7" href="/register">Don't have an account? Register</a>
                         </div>
-                    </div>
 
-                    {# <p class="has-text-centered is-size-7">By logging in you agree to the project usage policy.</p> #}
+
+                        {# <p class="has-text-centered is-size-7">By logging in you agree to the project usage policy.</p> #}
+                    </div>
                 </div>
             </div>
-        </div>
     </section>
 
     <script>

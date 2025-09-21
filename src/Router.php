@@ -36,6 +36,7 @@ class Router
         });
 
         SimpleRouter::get('/login', [self::class, 'login']);
+        SimpleRouter::post('/login', [self::class, 'loginPost']);
         SimpleRouter::get('/register', [self::class, 'register']);
         SimpleRouter::post('/register', [self::class, 'registerPost']);
 
@@ -69,6 +70,17 @@ class Router
     public static function login(): string
     {
         return self::$twig->load('login.twig')->render();
+    }
+
+    public static function loginPost(): string
+    {
+        $username = trim($_POST['username'] ?? '');
+        $pass = $_POST['password'] ?? '';
+
+        $auth = new DefaultAuth();
+        $data = $auth->login($username, $pass);
+
+        return self::$twig->load('login.twig')->render($data);
     }
 
     public static function register(): string

@@ -14,8 +14,42 @@ class DefaultAuth implements Authorizator, AccountHandler
         return true;
     }
 
-    public function login(string $usernamemail, string $password): void
+    /**
+     * @return array{errors: list<string>, success: bool, usermail: string}
+     */
+    public function login(string $usernamemail, string $password): array
     {
+        $data = ['success' => false,
+            'usermail' => $usernamemail,
+            'errors' => []
+        ];
+        $em = DoctrineRegistry::get();
+
+        if (filter_var($usernamemail, FILTER_VALIDATE_EMAIL)) {
+            /**
+             * @var User|null
+             */
+            $user = $em->getRepository(User::class)->findOneBy(['email' => $usernamemail]);
+
+        } else {
+            /**
+             * @var User|null
+             */
+            $user = $em->getRepository(User::class)->findOneBy(['username' => $usernamemail]);
+        }
+
+        if ($user == null) {
+            $data["errors"][] = 'User not found';
+        } else {
+            if (!$user->checkPassword($password)) {
+                $data["errors"][] = 'Invalid password';
+            }
+        }
+
+        if ($data["errors"] === []) {
+            $data["success"] = true;
+        }
+        return $data;
     }
 
     public function logout(): void

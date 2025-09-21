@@ -5,6 +5,9 @@ namespace Lylink\Interfaces\Auth;
 interface Authorizator
 {
     public function isAuthorized(): bool;
-    public function login(string $usernamemail, string $password): void;
+    /**
+     * @return array{errors: list<string>, success: bool, usermail: string}
+     */
+    public function login(string $usernamemail, string $password): array;
     public function logout(): void;
 }
