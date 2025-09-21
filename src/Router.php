@@ -9,6 +9,7 @@ use Lylink\Auth\DefaultAuth;
 use Lylink\Interfaces\Datatypes\PlaybackInfo;
 use Lylink\Interfaces\Datatypes\Track;
 use Lylink\Models\Lyrics;
+use Lylink\Routes\Integrations\Jellyfin;
 use Pecee\SimpleRouter\SimpleRouter;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
@@ -36,6 +37,9 @@ class Router
             SimpleRouter::get('/lyrics', [self::class, 'lyrics']);
             SimpleRouter::get('/edit', [self::class, 'edit']);
             SimpleRouter::get('/settings', [self::class, 'settings']);
+            SimpleRouter::partialGroup('/integrations', function () {
+                SimpleRouter::partialGroup('/jellyfin', Jellyfin::setup());
+            });
         });
 
         SimpleRouter::get('/login', [self::class, 'login']);

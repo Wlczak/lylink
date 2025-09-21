@@ -16,7 +16,7 @@ trait Authorizable
     }
 
     private int $uid;
-    public function getUid(): bool
+    public function getUid(): int
     {
         return $this->uid;
     }
