@@ -3,6 +3,7 @@
 namespace Lylink\Models;
 
 use Doctrine\ORM\Mapping as ORM;
+use Lylink\DoctrineRegistry;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
@@ -32,8 +33,8 @@ class User
     #[ORM\Column(type: 'boolean')]
     public bool $allowSpotifyLogin = false;
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    public string $jellyfinAccountId = "";
+    #[ORM\Column(type: 'integer', nullable: true)]
+    public int $jellyfinAccountId = 0;
 
     #[ORM\Column(type: 'boolean')]
     public bool $allowJellyfinLogin = false;
@@ -61,6 +62,34 @@ class User
         $this->email = $email;
         $this->username = $username;
         $this->password = $password;
+    }
+
+    public function __toString(): string
+    {
+        return $this->username;
+    }
+
+    public function updateJellyfin(string $address, string $token, bool $allow): void
+    {
+        $em = DoctrineRegistry::get();
+        /**
+         * @var JellyfinUser|null $jellyfin
+         */
+        $jellyfin = $em->getRepository(JellyfinUser::class)->findOneBy(['id' => $this->jellyfinAccountId]);
+
+        if ($jellyfin == null) {
+            $jellyfin = new JellyfinUser($address, $token);
+        }
+        $jellyfin->jellyfinAddress = $address;
+        $jellyfin->jellyfinToken = $token;
+
+        $em->persist($jellyfin);
+        $em->flush();
+
+        $this->jellyfinAccountId = $jellyfin->getId() ?? 0;
+        $this->allowJellyfinLogin = $allow;
+        $em->persist($this);
+        $em->flush();
     }
 
 }
