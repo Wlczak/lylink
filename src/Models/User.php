@@ -60,7 +60,7 @@ class User
     public function updateJellyfin(string $address, string $token, bool $allow): void
     {
         $em = DoctrineRegistry::get();
-        $settings = Settings::getSettings($this->getId() ?? 0);
+        $settings = Settings::getSettings($this);
 
         if ($settings == null) {
             $settings = new Settings($this);
