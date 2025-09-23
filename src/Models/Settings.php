@@ -87,7 +87,8 @@ class Settings
         return $settings;
     }
 
-    public function disconnectJellyfin(){
+    public function disconnectJellyfin(): void
+    {
         $this->allow_jellyfin_login = false;
         $this->jellyfin_connected = false;
         $this->jellyfin_server = null;
