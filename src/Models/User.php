@@ -3,6 +3,7 @@
 namespace Lylink\Models;
 
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Lylink\DoctrineRegistry;
 
 #[ORM\Entity]
@@ -60,10 +61,17 @@ class User
     public function updateJellyfin(string $address, string $token, bool $allow): void
     {
         $em = DoctrineRegistry::get();
-        $settings = Settings::getSettings($this);
+
+        $id = $this->id;
+
+        if ($id === null) {
+            throw new Exception("this user is not in db");
+        }
+
+        $settings = Settings::getSettings($id);
 
         if ($settings == null) {
-            $settings = new Settings($this);
+            $settings = new Settings($id);
         }
         $settings->jellyfin_server = $address;
         $settings->jellyfin_token = $token;

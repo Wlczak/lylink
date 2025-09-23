@@ -15,9 +15,8 @@ class Settings
     // @phpstan-ignore property.unusedType
     private ?int $id = null;
 
-    #[ORM\OneToOne(targetEntity: User::class, inversedBy: "settings")]
-    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
-    private User $user;
+    #[ORM\Column(type: 'integer')]
+    private int $user_id;
 
     // #[ORM\Column(type: 'string', length: 255, nullable: true)]
     // private ?string $api_token = null;
@@ -60,9 +59,9 @@ class Settings
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     public ?string $jellyfin_token = null;
 
-    public function __construct(User $user)
+    public function __construct(int $userId)
     {
-        $this->user = $user;
+        $this->user_id = $userId;
     }
 
     public function getId(): ?int
@@ -70,18 +69,20 @@ class Settings
         return $this->id;
     }
 
-    public function getUser(): User
+    public function getUserId(): int
     {
-        return $this->user;
+        return $this->user_id;
     }
 
-    public static function getSettings(User $user): Settings
+    public static function getSettings(int $userId): Settings
     {
         $em = DoctrineRegistry::get();
 
-        $settings = $em->getRepository(Settings::class)->findOneBy(['user' => $user->getId()]);
+        $settings = $em->getRepository(Settings::class)->findOneBy(["user_id" => $userId]);
         if ($settings == null) {
-            return new Settings($user);
+            $settings = new Settings($userId);
+            $em->persist($settings);
+            $em->flush();
         }
         return $settings;
     }

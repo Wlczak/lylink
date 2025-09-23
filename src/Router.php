@@ -4,6 +4,7 @@ declare (strict_types = 1);
 namespace Lylink;
 
 use Dotenv\Dotenv;
+use Exception;
 use Lylink\Auth\AuthSession;
 use Lylink\Auth\DefaultAuth;
 use Lylink\Interfaces\Datatypes\PlaybackInfo;
@@ -132,7 +133,11 @@ class Router
             header('Location: ' . $_ENV['BASE_DOMAIN'] . '/login');
             die();
         }
-        return self::$twig->load('settings.twig')->render(['user' => $user, 'settings' => Settings::getSettings($user)]);
+        $id = $user->getId();
+        if ($id === null) {
+            throw new Exception("invalid user id");
+        }
+        return self::$twig->load('settings.twig')->render(['user' => $user, 'settings' => Settings::getSettings($id)]);
     }
 
     function lyrics(): void

@@ -2,6 +2,7 @@
 
 namespace Lylink\Auth;
 
+use Exception;
 use Lylink\DoctrineRegistry;
 use Lylink\Interfaces\Auth\AccountHandler;
 use Lylink\Interfaces\Auth\Authorizator;
@@ -104,7 +105,11 @@ class DefaultAuth implements Authorizator, AccountHandler
 
             try {
                 $em->persist($user);
-                $settings = new Settings($user);
+                $id = $user->getId();
+                if ($id === null) {
+                    throw new Exception("user did not save to db");
+                }
+                $settings = new Settings($id);
                 $em->persist($settings);
                 $em->flush();
                 return [
