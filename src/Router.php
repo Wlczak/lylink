@@ -157,7 +157,7 @@ class Router
          */
         $track = $api->getTrack($trackId);
 
-        $template = self::$twig->load('edit.twig');
+        $template = self::$twig->load('lyrics/edit.twig');
 
         $em = DoctrineRegistry::get();
 
@@ -192,7 +192,7 @@ class Router
         $lyrics->lyrics = $_POST['lyrics'];
         $entityManager->persist($lyrics);
         $entityManager->flush();
-        header('Location: ' . $_ENV['BASE_DOMAIN'] . '/lyrics');
+        header('Location: ' . $_ENV['BASE_DOMAIN'] . '/lyrics/spotify');
     }
 
     function spotify(): string
