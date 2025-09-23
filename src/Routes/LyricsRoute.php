@@ -5,6 +5,7 @@ namespace Lylink\Routes;
 use Closure;
 use Lylink\Auth\AuthSession;
 use Lylink\Data\CurrentSong;
+use Lylink\Data\LyricsData;
 use Lylink\Data\Source;
 use Lylink\DoctrineRegistry;
 use Lylink\Interfaces\Datatypes\PlaybackInfo;
@@ -63,7 +64,9 @@ class LyricsRoute extends Router implements Route
 
     public static function jellyfinLyrics(): string
     {
-        return self::$twig->load('lyrics/jellyfin.twig')->render();
+        $lyricsData = new LyricsData(name: "Loading...", is_playing: false);
+
+        return self::$twig->load('lyrics/jellyfin.twig')->render(["song" => $lyricsData]);
     }
 
     public function spotifyLyrics(): void
