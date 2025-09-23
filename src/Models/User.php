@@ -27,18 +27,6 @@ class User
     #[ORM\Column(type: 'string')]
     private string $password;
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    public string $spotifyId = "";
-
-    #[ORM\Column(type: 'boolean')]
-    public bool $allowSpotifyLogin = false;
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    public int $jellyfinAccountId = 0;
-
-    #[ORM\Column(type: 'boolean')]
-    public bool $allowJellyfinLogin = false;
-
     /**
      * @return int|null
      */
@@ -72,23 +60,17 @@ class User
     public function updateJellyfin(string $address, string $token, bool $allow): void
     {
         $em = DoctrineRegistry::get();
-        /**
-         * @var JellyfinUser|null $jellyfin
-         */
-        $jellyfin = $em->getRepository(JellyfinUser::class)->findOneBy(['id' => $this->jellyfinAccountId]);
+        $settings = Settings::getSettings($this->getId() ?? 0);
 
-        if ($jellyfin == null) {
-            $jellyfin = new JellyfinUser($address, $token);
+        if ($settings == null) {
+            $settings = new Settings($this);
         }
-        $jellyfin->jellyfinAddress = $address;
-        $jellyfin->jellyfinToken = $token;
+        $settings->jellyfin_server = $address;
+        $settings->jellyfin_token = $token;
+        $settings->jellyfin_user_id = null;
+        $settings->allow_jellyfin_login = $allow;
 
-        $em->persist($jellyfin);
-        $em->flush();
-
-        $this->jellyfinAccountId = $jellyfin->getId() ?? 0;
-        $this->allowJellyfinLogin = $allow;
-        $em->persist($this);
+        $em->persist($settings);
         $em->flush();
     }
 

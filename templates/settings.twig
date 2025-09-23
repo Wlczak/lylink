@@ -67,8 +67,8 @@
                                 <label class="label">Username</label>
                                 <div class="control">
                                     <input class="input" type="text" name="username" id="username"
-                                        placeholder="username" disabled
-                                        value="{{ user.username|default(user.username|default(''))|e }}" title="You can't change your username"/>
+                                        placeholder="username" disabled value="{{ user.username|default('')|e }}"
+                                        title="You can't change your username" />
                                 </div>
                             </div>
 
@@ -76,8 +76,8 @@
                                 <label class="label">Email</label>
                                 <div class="control">
                                     <input class="input" type="email" name="email" id="email"
-                                        placeholder="you@example.com" required
-                                        value="{{ settings.email|default(user.email|default(''))|e }}" disabled />
+                                        placeholder="you@example.com" required value="{{ user.email|default('')|e }}"
+                                        disabled />
                                 </div>
                             </div>
 
@@ -171,7 +171,8 @@
                                 <p class="subtitle is-6">Spotify</p>
                                 {% if settings.spotify_connected %}
                                 <p class="is-size-7">Connected as
-                                    <strong>{{ settings.spotify_user_display_name|e }}</strong></p>
+                                    <strong>{{ settings.spotify_user_display_name|e }}</strong>
+                                </p>
                                 {% else %}
                                 <p class="is-size-7">Not connected</p>
                                 {% endif %}
@@ -180,7 +181,8 @@
                                 {% if settings.spotify_connected %}
                                 <a class="button is-light" href="/integrations/spotify/disconnect">Disconnect</a>
                                 {% else %}
-                                <a class="button is-primary" {#href="/integrations/spotify/connect"#} disabled>Connect Spotify</a>
+                                <a class="button is-primary" {#href="/integrations/spotify/connect"#} disabled>Connect
+                                    Spotify</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -227,7 +229,8 @@
 
                             <div class="field is-grouped">
                                 <div class="control">
-                                    <button class="button is-primary" type="submit" disabled>Save developer settings</button>
+                                    <button class="button is-primary" type="submit" disabled>Save developer
+                                        settings</button>
                                 </div>
                             </div>
                         </form>
