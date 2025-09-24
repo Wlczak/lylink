@@ -24,8 +24,14 @@ function getMediaInfo(address: string, token: string) {
     const mediaId = new URLSearchParams(window.location.search).get("ep_id");
     fetch(address + "/Item/" + mediaId, { method: "POST", body: JSON.stringify({ token: token }) })
         .then((response) => response.json())
-        .then((data) => {
-            const item = data[0];
-            console.log(item);
+        .then((data: MediaInfo) => {
+            console.log(data.Name);
+            updateMediainfo(data);
         });
+}
+
+function updateMediainfo(info: MediaInfo) {
+    const name = document.getElementById("name") as HTMLParagraphElement;
+    const fullName = info.SeriesName + " - " +"S" + info.ParentIndexNumber + "E" + info.IndexNumber + " - "+ info.Name
+    name.innerHTML = fullName;
 }
