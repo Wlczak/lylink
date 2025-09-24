@@ -20,7 +20,6 @@ function getPlaybackStatus(address: string, token: string) {
             const id = new URLSearchParams(window.location.search).get("ep_id");
             if (id == null || id != item.PlayState.MediaSourceId) {
                 window.location.search = "?ep_id=" + item.PlayState.MediaSourceId;
-
                 setTimeout(() => {
                     window.location.reload();
                 }, 100);
@@ -50,6 +49,6 @@ function getMediaInfo(address: string, token: string) {
 function updateMediainfo(info: MediaInfo) {
     const name = document.getElementById("name") as HTMLParagraphElement;
     const fullName =
-        info.SeriesName + " - " + "S" + info.ParentIndexNumber + "E" + info.IndexNumber + " - " + info.Name;
+        info.SeriesName + " - " + "S" + String (info.ParentIndexNumber).padStart(2, "0") + "E" + String (info.IndexNumber).padStart(2, "0")+ " - " + info.Name;
     name.innerHTML = fullName;
 }
