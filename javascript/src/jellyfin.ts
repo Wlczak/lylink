@@ -21,7 +21,8 @@ function getPlaybackStatus(address: string, token: string) {
         });
 }
 function getMediaInfo(address: string, token: string) {
-    fetch(address + "/Item", { method: "POST", body: JSON.stringify({ token: token }) })
+    const mediaId = new URLSearchParams(window.location.search).get("ep_id");
+    fetch(address + "/Item/" + mediaId, { method: "POST", body: JSON.stringify({ token: token }) })
         .then((response) => response.json())
         .then((data) => {
             const item = data[0];
