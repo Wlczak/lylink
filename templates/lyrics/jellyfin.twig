@@ -11,9 +11,6 @@
 <body>
     <section class="section">
         <div class="container">
-            {# {% set progressPercent = 42 %} #}
-            {# {% set lyrics = "I fly like paper, get high like planes\nIf you catch me at the border I got visas in my name\nSometimes I think sittin' quiet's the way to go\nBut I keep trying, singing on the radio" %} #}
-
             <div class="card">
                 <div class="card-content">
                     <div class="media">
@@ -47,8 +44,6 @@
                         <h3 class="title is-6">Lyrics</h3>
                         <div class="content">
                             {% for line in lyrics|split("\n") %}
-
-
                             {% if line|trim is empty %}
                             <line style="display: block; height: 1.33em;"></line>
                             {% else %}
@@ -74,5 +69,14 @@
 </html>
 
 <script>
-    
+    address = "{{ address }}";
+    tokent = "{{ token }}";
+    function getPlaybackStatus() {
+        fetch(address + '/getPlaybackInfo', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+    }
+    getPlaybackStatus();
 </script>

@@ -59,14 +59,24 @@ class LyricsRoute extends Router implements Route
             $sources[] = new Source(id: 2, name: "Jellyfin", route: "/lyrics/jellyfin", current_song: new CurrentSong(id: "2", title: "Episode X", progress_ms: 5000, duration_ms: 100000));
         }
 
-        return self::$twig->load('lyrics/lyrics_page.twig')->render(["auth" => $auth, "sources" => $sources]);
+        return self::$twig->load('lyrics/lyrics_select.twig')->render(["auth" => $auth, "sources" => $sources]);
     }
 
     public static function jellyfinLyrics(): string
     {
         $lyricsData = new LyricsData(name: "Loading...", is_playing: false);
 
-        return self::$twig->load('lyrics/jellyfin.twig')->render(["song" => $lyricsData]);
+        $settings = Settings::getSettings(AuthSession::get()?->getUser()?->getId() ?? 0);
+
+        if ($settings->jellyfin_connected) {
+            $address = $settings->jellyfin_server;
+            $token = $settings->jellyfin_token;
+        } else {
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/login');
+            die();
+        }
+
+        return self::$twig->load('lyrics/jellyfin.twig')->render(["song" => $lyricsData, "address" => $address, "token" => $token]);
     }
 
     public function spotifyLyrics(): void
