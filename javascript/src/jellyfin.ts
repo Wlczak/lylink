@@ -1,6 +1,7 @@
 export function start(address: string, token: string) {
     getPlaybackStatus(address, token);
-    // getMediaInfo(address, token);
+    setInterval(() => getPlaybackStatus(address, token), 5000);
+    getMediaInfo(address, token);
 }
 
 function getPlaybackStatus(address: string, token: string) {
@@ -13,18 +14,21 @@ function getPlaybackStatus(address: string, token: string) {
                 img.src = "/img/albumPlaceholer.svg";
                 const nameValue = "Nothing is playing";
                 name.innerHTML = nameValue;
+                if (new URLSearchParams(window.location.search).get("ep_id") != null) {
+                    window.location.search = "";
+                }
                 return;
             }
 
             const item = data[0];
             const id = new URLSearchParams(window.location.search).get("ep_id");
-            if (id == null || id != item.PlayState.MediaSourceId) {
+            if (id != item.PlayState.MediaSourceId) {
                 window.location.search = "?ep_id=" + item.PlayState.MediaSourceId;
                 setTimeout(() => {
                     window.location.reload();
                 }, 100);
             } else {
-                getMediaInfo(address, token);
+                // getMediaInfo(address, token);
             }
         });
 }
@@ -49,6 +53,13 @@ function getMediaInfo(address: string, token: string) {
 function updateMediainfo(info: MediaInfo) {
     const name = document.getElementById("name") as HTMLParagraphElement;
     const fullName =
-        info.SeriesName + " - " + "S" + String (info.ParentIndexNumber).padStart(2, "0") + "E" + String (info.IndexNumber).padStart(2, "0")+ " - " + info.Name;
+        info.SeriesName +
+        " - " +
+        "S" +
+        String(info.ParentIndexNumber).padStart(2, "0") +
+        "E" +
+        String(info.IndexNumber).padStart(2, "0") +
+        " - " +
+        info.Name;
     name.innerHTML = fullName;
 }
