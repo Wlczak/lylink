@@ -32,12 +32,19 @@ function getPlaybackStatus(address: string, token: string) {
                 const progressTime = document.getElementById("progress-time") as HTMLSpanElement;
                 const totalTime = document.getElementById("total-time") as HTMLSpanElement;
 
-                const cur_min = (item.PlayState.PositionTicks / 60000000000) | 0;
-                const cur_sec = (item.PlayState.PositionTicks - cur_min * 60000000000) / 10000000;
-                const total_min = (item.RunTimeTicks / 60000000000) | 0;
-                const total_sec = (item.RunTimeTicks - total_min * 60000000000) / 10000000;
+                const TICKS_PER_SECOND = BigInt(10000000);
+                const TICKS_PER_MINUTE = TICKS_PER_SECOND * BigInt(60);
+                const POSITION_TICKS = BigInt(item.PlayState.PositionTicks);
+                const RUN_TIME_TICKS = BigInt(item.NowPlayingItem.RunTimeTicks);
 
-                const progressPercent = (item.PlayState.PositionTicks * 100) / item.RunTimeTicks;
+                const cur_min = POSITION_TICKS / TICKS_PER_MINUTE;
+                const cur_sec =
+                    (POSITION_TICKS - cur_min * TICKS_PER_MINUTE) / TICKS_PER_SECOND;
+
+                const total_min = RUN_TIME_TICKS / TICKS_PER_MINUTE;
+                const total_sec = (RUN_TIME_TICKS - total_min * TICKS_PER_MINUTE) / TICKS_PER_SECOND;
+
+                const progressPercent = (POSITION_TICKS * BigInt(100)) / RUN_TIME_TICKS;
                 console.log(progressPercent, Number.isFinite(progressPercent));
                 progressBar.value = 50;
                 progressTime.innerHTML = `${cur_min < 10 ? "0" + cur_min : cur_min}:${
