@@ -57,10 +57,12 @@
                             <button class="delete" onclick="this.parentElement.remove()"></button>
                             <strong>Email verified!</strong>
                             <p>Your email <strong>{{ email|e }}</strong> has been verified. You can <a href="/login">log
-                                    in now</a>.</p>
+                                    in
+                                    now</a>.</p>
                         </div>
-                        {% else %}
+                        {% endif %}
 
+                        {% if not (success is defined and success) %}
                         <div class="content">
                             <p>We've sent a verification link to <strong>{{ email|e }}</strong>. Copy the recived code
                                 to verify your email.</p>
@@ -97,12 +99,8 @@
                                 </div>
                             </div>
                         </form>
-
-                        {#<div class="has-text-centered">
-                            <p class="is-size-7">Already verified? <a href="/login">Log in</a></p>
-                        </div>#}
-
                         {% endif %}
+
                     </div>
                 </div>
             </div>
