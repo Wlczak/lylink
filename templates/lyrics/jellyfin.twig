@@ -7,10 +7,11 @@
     <title>LyLink — {{ song.name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.4/css/bulma.min.css" />
     <script type="module">
-        import { start } from '/dist/jellyfin.js';
+        import { Jellyfin } from '/dist/jellyfin.js';
+        let jelly = new Jellyfin();
         let address = "{{ address }}";
         let token = "{{ token }}";
-        start(address, token);
+        jelly.setUp(address, token);
     </script>
     <script type="module" src="/dist/jellyfin.js"></script>
 </head>
@@ -23,8 +24,8 @@
                     <div class="media">
                         <div class="media-left">
                             <figure style="border-radius: 12px;" class="image is-128x128 has-background-grey-lighter">
-                                <img id="cover-image" style="border-radius: 12px;" class="image is-128x128" src="{{ song.imageUrl }}"
-                                    alt="{{ song.name }} cover">
+                                <img id="cover-image" style="border-radius: 12px;" class="image is-128x128"
+                                    src="{{ song.imageUrl }}" alt="{{ song.name }} cover">
                             </figure>
                         </div>
                         <div class="media-content">
