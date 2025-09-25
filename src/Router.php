@@ -9,6 +9,7 @@ use Lylink\Auth\AuthSession;
 use Lylink\Auth\DefaultAuth;
 use Lylink\Interfaces\Datatypes\PlaybackInfo;
 use Lylink\Interfaces\Datatypes\Track;
+use Lylink\Mail\Mailer;
 use Lylink\Models\Lyrics;
 use Lylink\Models\Settings;
 use Lylink\Routes\Integrations\Api\IntegrationApi;
@@ -17,7 +18,6 @@ use Lylink\Routes\LyricsRoute;
 use Pecee\SimpleRouter\SimpleRouter;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
-use SpotifyWebAPI\SpotifyWebAPIException;
 
 class Router
 {
@@ -51,6 +51,7 @@ class Router
         SimpleRouter::post('/login', [self::class, 'loginPost']);
         SimpleRouter::get('/register', [self::class, 'register']);
         SimpleRouter::post('/register', [self::class, 'registerPost']);
+        SimpleRouter::get('/email/verify', [self::class, 'emailVerify']);
         SimpleRouter::get('/logout', function () {
             AuthSession::logout();
             header('Location: ' . $_ENV['BASE_DOMAIN']);
@@ -119,7 +120,21 @@ class Router
         $auth = new DefaultAuth();
         $data = $auth->register($email, $username, $pass, $passCheck);
 
+        if ($data['success']) {
+            $code = random_int(100000, 999999);
+            $_SESSION['email_verify'] = ['email' => $email, 'username' => $username, 'code' => $code];
+
+            Mailer::send($email, $username, 'Email verification', self::$twig->load('email/verify_code.twig')->render(['code' => $code]));
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/email/verify');
+        }
+
         return self::$twig->load('register.twig')->render($data);
+    }
+
+    function emailVerify(): string
+    {
+
+        return self::$twig->load('verify.twig')->render();
     }
 
     function settings(): string
