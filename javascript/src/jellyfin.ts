@@ -1,4 +1,4 @@
-export class Jellyfin {
+export class JellyfinPlayback {
     playbackInterval: number = 0;
     refreshInterval: number = 0;
 
