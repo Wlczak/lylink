@@ -34,10 +34,14 @@ services:
     command: ["php", "-S", "0.0.0.0:80", "-t", "/var/www/html/public_html"]
 ```
 
-In both cases you will have to privide a config of the .env file. You can copy the skeleton from the .env.example file or this example:
+In both cases you will have to set up environment variables in the .env file. You can copy the skeleton from the .env.example file or this example:
 
 ```bash
 CLIENT_ID=
 CLIENT_SECRET=
 BASE_DOMAIN=
+SMTP_USERNAME=
+SMTP_PASSWORD=
 ```
+
+Both files can be found in the config directory.
