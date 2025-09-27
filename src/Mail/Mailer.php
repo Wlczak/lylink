@@ -11,7 +11,7 @@ class Mailer
         $mail = new PHPMailer(true);
 
         $mail->isSMTP();
-        $mail->Host = 'smtp.seznam.cz';
+        $mail->Host = $_ENV['SMTP_HOST'];
         $mail->SMTPAuth = true;
         $mail->Username = $_ENV['SMTP_USERNAME'];
         $mail->Password = $_ENV['SMTP_PASSWORD'];

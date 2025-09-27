@@ -80,8 +80,7 @@
                                         <!-- <a class="button is-link is-small" style="min-width:72px"
                                             href="/source/select?id={{ src.name|lower }}">Use</a> -->
                                         <a id="src-open-lyrics-{{ src.name|lower }}" class="button is-light is-small"
-                                            style="min-width:96px"
-                                            href="{{ src.route }}">Open
+                                            style="min-width:96px" href="{{ src.route }}">Open
                                             lyrics</a>
                                     </div>
                                 </div>
@@ -90,7 +89,8 @@
                     </div>
                     {% else %}
                     <div class="column is-12">
-                        <div class="notification is-warning">No sources available</div>
+                        <div class="notification is-warning">No sources available. You can add them in your <a
+                                href="/settings">settings</a>.</div>
                     </div>
                     {% endfor %}
                 </div>

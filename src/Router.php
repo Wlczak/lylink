@@ -226,7 +226,7 @@ class Router
          */
         $track = $api->getTrack($trackId);
 
-        $template = self::$twig->load('lyrics/edit.twig');
+        $template = self::$twig->load('lyrics/spotify_edit.twig');
 
         $em = DoctrineRegistry::get();
 

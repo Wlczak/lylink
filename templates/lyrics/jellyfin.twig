@@ -64,10 +64,10 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="content">
-                        <a class="button is-link" href="/edit?id={{ song.id }}">Edit</a>
-                    </div>
                     {% endif %}
+                    <div id="edit-container" class="content" hidden>
+                        <a id="edit-btn" class="button is-link" href="/edit?id={{ song.id }}">Edit</a>
+                    </div>
                 </div>
             </div>
         </div>

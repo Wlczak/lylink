@@ -81,6 +81,8 @@ export class JellyfinPlayback {
 
                     this.progress_ticks = POSITION_TICKS;
                     this.duration_ticks = RUN_TIME_TICKS;
+
+                    this.enableEdit(id);
                 }
             });
     }
@@ -139,5 +141,12 @@ export class JellyfinPlayback {
             " - " +
             info.Name;
         this.changeTitle(fullName);
+    }
+
+    enableEdit(epId: string) {
+        const editContainer = document.getElementById("edit-container") as HTMLDivElement;
+        const editBtn = document.getElementById("edit-btn") as HTMLAnchorElement;
+        editBtn.href = "/edit?ep_id=" + epId;
+        editContainer.toggleAttribute("hidden");
     }
 }
