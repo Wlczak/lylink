@@ -40,6 +40,7 @@ In both cases you will have to set up environment variables in the .env file. Yo
 CLIENT_ID=
 CLIENT_SECRET=
 BASE_DOMAIN=
+SMTP_HOST=
 SMTP_USERNAME=
 SMTP_PASSWORD=
 ```
