@@ -145,7 +145,7 @@ export class JellyfinPlayback {
     enableEdit(epId: string, seasonId: string, showId: string) {
         const editContainer = document.getElementById("edit-container") as HTMLDivElement;
         const editBtn = document.getElementById("edit-btn") as HTMLAnchorElement;
-        editBtn.href = "/edit?ep_id=" + epId + "&season_id=" + seasonId + "&show_id=" + showId;
+        editBtn.href = "/lyrics/jellyfin/edit?ep_id=" + epId + "&season_id=" + seasonId + "&show_id=" + showId;
         editContainer.hidden = false;
     }
 }
