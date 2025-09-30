@@ -28,6 +28,8 @@ class LyricsRoute extends Router implements Route
             SimpleRouter::post('/spotify', [self::class, 'update']);
 
             SimpleRouter::get('/jellyfin', [self::class, 'jellyfinLyrics']);
+            SimpleRouter::get('/jellyfin/edit', [self::class, 'jellyfinEdit']);
+            SimpleRouter::post('/jellyfin/edit', [self::class, 'jellyfinUpdate']);
         };
     }
 
@@ -77,6 +79,16 @@ class LyricsRoute extends Router implements Route
         }
 
         return self::$twig->load('lyrics/jellyfin.twig')->render(["song" => $lyricsData, "address" => $address, "token" => $token]);
+    }
+
+    public static function jellyfinEdit(): string
+    {
+        return self::$twig->load('lyrics/jellyfin_edit.twig')->render();
+    }
+
+    public static function jellyfinUpdate(): string
+    {
+        return "";
     }
 
     public function spotifyLyrics(): void
