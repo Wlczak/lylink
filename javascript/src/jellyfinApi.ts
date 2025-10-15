@@ -7,6 +7,6 @@ export class JellyfinApi {
     }
 
     static getItem(address: string, token: string, mediaId: string): Promise<Response> {
-        return fetch(address + "/Item/" + mediaId, { method: "POST", body: JSON.stringify({ token: token }) });
+        return fetch(address + "/Episode/WithParents/" + mediaId, { method: "POST", body: JSON.stringify({ token: token }) });
     }
 }
