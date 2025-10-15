@@ -119,7 +119,7 @@ export class JellyfinPlayback {
             placeholder();
             return;
         }
-        JellyfinApi.getItem(address, token, mediaId)
+        JellyfinApi.getEpisodeWithParents(address, token, mediaId)
             .then((response) => response.json())
             .then((data: EpisodeInfo | null | undefined) => {
                 if (data === null || data === undefined) {

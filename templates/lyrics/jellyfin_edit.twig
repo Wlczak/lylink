@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Edit Series Lyrics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.4/css/bulma.min.css" />
+    <script type="module">
+        import { JellyfinEdit } from '/dist/jellyfinEdit.js';
+        let address = "{{ address }}";
+        let token = "{{ token }}";
+        JellyfinEdit.setUp(address, token);
+    </script>
 </head>
 
 <body>
