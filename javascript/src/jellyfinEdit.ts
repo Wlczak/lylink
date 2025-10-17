@@ -46,15 +46,27 @@ export class JellyfinEdit {
         ) as HTMLOptionElement;
         activeSeason.selected = true;
 
-        this.setEpisodeSelects(seasonsSelect.selectedOptions[0].innerText, episodeList);
+        this.setEpisodeSelects(
+            seasonsSelect.selectedOptions[0].innerText,
+            episodeList,
+            episodeInfo.IndexNumber
+        );
         seasonsSelect.addEventListener("change", () => {
-            this.setEpisodeSelects(seasonsSelect.selectedOptions[0].innerText, episodeList);
+            this.setEpisodeSelects(
+                seasonsSelect.selectedOptions[0].innerText,
+                episodeList,
+                episodeInfo.IndexNumber
+            );
         });
 
         seriesTitle.value = episodeInfo.SeriesName;
     }
 
-    static setEpisodeSelects(seasonIndexName: string, episodeList: Array<EpisodeInfo>) {
+    static setEpisodeSelects(
+        seasonIndexName: string,
+        episodeList: Array<EpisodeInfo>,
+        currentEpisodeIndex: number
+    ) {
         const seasonIndex = parseInt(seasonIndexName.replace("S", ""));
         const episodeIndexList: number[] = [];
         const firstEpisodeSelect = document.getElementById("firstEpisodeSelect") as HTMLSelectElement;
@@ -74,12 +86,18 @@ export class JellyfinEdit {
             const option = document.createElement("option");
             option.text = "E" + episodeIndex.toString();
             option.value = episodeIndex.toString();
+            if (episodeIndex == currentEpisodeIndex) {
+                option.selected = true;
+            }
             firstEpisodeSelect.add(option);
         });
         episodeIndexList.forEach((episodeIndex) => {
             const option = document.createElement("option");
             option.text = "E" + episodeIndex.toString();
             option.value = episodeIndex.toString();
+            if (episodeIndex == currentEpisodeIndex) {
+                option.selected = true;
+            }
             lastEpisodeSelect.add(option);
         });
     }
