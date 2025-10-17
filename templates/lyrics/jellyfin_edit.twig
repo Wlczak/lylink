@@ -21,7 +21,7 @@
 
             <div class="columns">
                 <div class="column is-two-thirds">
-                    <form method="post" action="{{ path_save }}" id="lyricsForm">
+                    <form method="post" id="lyricsForm">
                         <input type="hidden" name="series_id" value="{{ series.id }}">
                         <input type="hidden" name="lyrics_id" value="{{ lyrics_id }}">
 
@@ -103,7 +103,7 @@
 
                         <div class="field is-grouped">
                             <div class="control">
-                                <button class="button is-primary" type="submit" id="saveBtn">Save</button>
+                                <button class="button is-primary" id="saveBtn">Save</button>
                             </div>
                             <div class="control">
                                 <button class="button is-light" type="button" id="cancelBtn"

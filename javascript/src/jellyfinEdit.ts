@@ -18,6 +18,9 @@ export class JellyfinEdit {
         console.log(seriesInfo);
 
         this.setMediaInfo(episodeInfo, episodeList);
+
+        const form = document.getElementById("lyricsForm") as HTMLFormElement;
+        form.addEventListener("submit", this.saveForm);
     }
 
     static setMediaInfo(episodeInfo: EpisodeInfo, episodeList: Array<EpisodeInfo> = []) {
@@ -122,5 +125,24 @@ export class JellyfinEdit {
             lastParent.title = "";
             saveButton.disabled = false;
         }
+    }
+
+    static saveForm(e: Event) {
+        e.preventDefault();
+        const seasonInput = document.getElementById("season") as HTMLSelectElement;
+        const firstEpisodeSelect = document.getElementById("firstEpisodeSelect") as HTMLSelectElement;
+        const lastEpisodeSelect = document.getElementById("lastEpisodeSelect") as HTMLSelectElement;
+        const lyricsInput = document.getElementById("lyricsInput") as HTMLInputElement;
+
+        const showId = new URLSearchParams(window.location.search).get("show_id");
+        const seasonId = seasonInput.value;
+        const seasonNumber = seasonInput.selectedOptions[0].innerText.replace("S", "");
+        const firstEpisode = firstEpisodeSelect.value;
+        const lastEpisode = lastEpisodeSelect.value;
+        const lyrics = lyricsInput.value;
+
+        console.log(
+            `showId: ${showId}, seasonId: ${seasonId}, seasonNumber: ${seasonNumber}, firstEpisode: ${firstEpisode}, lastEpisode: ${lastEpisode}, lyrics: ${lyrics}`
+        );
     }
 }
