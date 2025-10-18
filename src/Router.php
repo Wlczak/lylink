@@ -255,7 +255,7 @@ class Router
         $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $_POST['id']]);
         if ($lyrics == null) {
             $lyrics = new Lyrics();
-            $lyrics->spotify_id = $_POST['id'];
+            $lyrics->spotifyId = $_POST['id'];
         }
         $lyrics->lyrics = $_POST['lyrics'];
         $entityManager->persist($lyrics);

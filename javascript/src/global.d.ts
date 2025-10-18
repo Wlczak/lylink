@@ -3,16 +3,16 @@ interface EpisodeWithParentsInfo {
     Name: string;
     Type: string;
     SeriesName: string;
-    IndexNumber: number;
-    ParentIndexNumber: number;
+    IndexNumber: number; //Episode index
+    ParentIndexNumber: number; //Season index
     ParentId: number;
     SeasonId: string;
     SeriesId: string;
 }
 
-interface SimpleSeason{
-    Index: number
-    Id: string
+interface SimpleSeason {
+    Index: number;
+    Id: string;
 }
 
 interface EpisodeInfo {

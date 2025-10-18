@@ -36,11 +36,49 @@ export class JellyfinPlayback {
 
                 const item = data[0];
                 const id = new URLSearchParams(window.location.search).get("ep_id");
-                if (id != item.PlayState.MediaSourceId) {
-                    window.location.search = "?ep_id=" + item.PlayState.MediaSourceId;
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 100);
+                const episodeIndex = new URLSearchParams(window.location.search).get("ep_index");
+                const seasonIndex = new URLSearchParams(window.location.search).get("season_index");
+                const showId = new URLSearchParams(window.location.search).get("show_id");
+
+                if (
+                    id != item.PlayState.MediaSourceId ||
+                    episodeIndex == null ||
+                    episodeIndex == undefined ||
+                    episodeIndex == "" ||
+                    seasonIndex == null ||
+                    seasonIndex == undefined ||
+                    seasonIndex == "" ||
+                    showId == null ||
+                    showId == undefined ||
+                    showId == ""
+                ) {
+                    JellyfinApi.getEpisodeWithParents(address, token, item.PlayState.MediaSourceId).then(
+                        (response) => {
+                            if (response.ok) {
+                                response.json().then((data: EpisodeWithParentsInfo | null | undefined) => {
+                                    if (data != null && data != undefined) {
+                                        const episodeIndex = data.IndexNumber;
+                                        const seasonIndex = data.ParentIndexNumber;
+
+                                        window.location.search =
+                                            "?ep_id=" +
+                                            item.PlayState.MediaSourceId +
+                                            "&ep_index=" +
+                                            episodeIndex +
+                                            "&season_index=" +
+                                            seasonIndex +
+                                            "&show_id=" +
+                                            data.SeriesId;
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 100);
+                                    }
+                                });
+                            } else {
+                                alert("Failed to get episode info");
+                            }
+                        }
+                    );
                 } else {
                     const progressBar = document.getElementById("progress-bar") as HTMLProgressElement;
                     const progressTime = document.getElementById("progress-time") as HTMLSpanElement;

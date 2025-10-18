@@ -3,6 +3,8 @@
 namespace Lylink\Routes;
 
 use Closure;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Lylink\Auth\AuthSession;
 use Lylink\Data\CurrentSong;
 use Lylink\Data\LyricsData;
@@ -73,6 +75,32 @@ class LyricsRoute extends Router implements Route
         if ($settings->jellyfin_connected) {
             $address = $settings->jellyfin_server;
             $token = $settings->jellyfin_token;
+
+            if (isset($_GET["show_id"]) && isset($_GET["season_index"]) && isset($_GET["ep_index"])) {
+                $showId = $_GET["show_id"];
+                $seasonIndex = $_GET["season_index"];
+                $episodeIndex = $_GET["ep_index"];
+
+                $em = DoctrineRegistry::get();
+                $qb = $em->getRepository(Lyrics::class)->createQueryBuilder("l");
+
+                $qb->where("l.jellyfinShowId = :showId");
+                $qb->andWhere("l.jellyfinSeasonNumber = :seasonNumber");
+                $qb->andWhere("l.jellyfinStartEpisodeNumber <= :episodeNumber");
+                $qb->andWhere("l.jellyfinEndEpisodeNumber >= :episodeNumber");
+                $qb->setParameters(new ArrayCollection([new Parameter("showId", $showId), new Parameter("seasonNumber", $seasonIndex), new Parameter("episodeNumber", $episodeIndex)]));
+                $qb->setMaxResults(1);
+
+                /**
+                 * @var Lyrics|null $lyrics
+                 */
+                $lyrics = $qb->getQuery()->getOneOrNullResult();
+                if ($lyrics != null) {
+                    $lyricsData->lyrics = $lyrics->lyrics;
+                    $lyricsData->id = $showId;
+                }
+            }
+
         } else {
             header('Location: ' . $_ENV['BASE_DOMAIN'] . '/login');
             die();
@@ -120,14 +148,22 @@ class LyricsRoute extends Router implements Route
 
         if (AuthSession::get()?->isAuthorized()) {
             $entityManager = DoctrineRegistry::get();
-            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['jellyfin_show_id' => $showId, 'jellyfin_season_number' => $seasonNumber, 'jellyfin_start_episode_number' => $firstEpisode, 'jellyfin_end_episode_number' => $lastEpisode]);
+            /**
+             * @var Lyrics|null
+             */
+            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy([
+                'jellyfinShowId' => $showId,
+                'jellyfinSeasonNumber' => $seasonNumber,
+                'jellyfinStartEpisodeNumber' => $firstEpisode,
+                'jellyfinEndEpisodeNumber' => $lastEpisode
+            ]);
             if ($lyrics == null) {
                 $lyrics = new Lyrics();
             }
-            $lyrics->jellyfin_show_id = $showId;
-            $lyrics->jellyfin_season_number = $seasonNumber;
-            $lyrics->jellyfin_start_episode_number = $firstEpisode;
-            $lyrics->jellyfin_end_episode_number = $lastEpisode;
+            $lyrics->jellyfinShowId = $showId;
+            $lyrics->jellyfinSeasonNumber = $seasonNumber;
+            $lyrics->jellyfinStartEpisodeNumber = $firstEpisode;
+            $lyrics->jellyfinEndEpisodeNumber = $lastEpisode;
             $lyrics->lyrics = $lyricsText;
             $entityManager->persist($lyrics);
             $entityManager->flush();
