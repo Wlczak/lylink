@@ -101,6 +101,39 @@ class LyricsRoute extends Router implements Route
 
     public static function jellyfinUpdate(): string
     {
+        $input = file_get_contents('php://input');
+        if ($input === false || $input === '') {
+            http_response_code(400);
+            return '';
+        }
+
+        /**
+         * @var array{showId:string,seasonNumber:int,firstEpisode:int,lastEpisode:int,lyrics:string}
+         */
+        $json = json_decode($input, true);
+
+        $showId = $json['showId'];
+        $seasonNumber = $json['seasonNumber'];
+        $firstEpisode = $json['firstEpisode'];
+        $lastEpisode = $json['lastEpisode'];
+        $lyricsText = $json['lyrics'];
+
+        if (AuthSession::get()?->isAuthorized()) {
+            $entityManager = DoctrineRegistry::get();
+            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['jellyfin_show_id' => $showId, 'jellyfin_season_number' => $seasonNumber, 'jellyfin_start_episode_number' => $firstEpisode, 'jellyfin_end_episode_number' => $lastEpisode]);
+            if ($lyrics == null) {
+                $lyrics = new Lyrics();
+            }
+            $lyrics->jellyfin_show_id = $showId;
+            $lyrics->jellyfin_season_number = $seasonNumber;
+            $lyrics->jellyfin_start_episode_number = $firstEpisode;
+            $lyrics->jellyfin_end_episode_number = $lastEpisode;
+            $lyrics->lyrics = $lyricsText;
+            $entityManager->persist($lyrics);
+            $entityManager->flush();
+            return "ok";
+        }
+        http_response_code(500);
         return "";
     }
 

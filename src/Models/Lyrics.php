@@ -15,11 +15,23 @@ class Lyrics
     // @phpstan-ignore property.unusedType
     private int|null $id = null;
 
-    #[ORM\Column(type: 'string', unique: true)]
-    public string $spotify_id;
+    #[ORM\Column(type: 'string', nullable: true)]
+    public string $spotify_id = "";
 
     #[ORM\Column(type: 'string')]
     public string $lyrics = "";
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    public string $jellyfin_show_id = "";
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    public int $jellyfin_season_number = 0;
+
+    #[ORM\Column(type: 'integer')]
+    public int $jellyfin_start_episode_number = 0;
+
+    #[ORM\Column(type: 'integer')]
+    public int $jellyfin_end_episode_number = 0;
 
     /**
      * @return int|null
