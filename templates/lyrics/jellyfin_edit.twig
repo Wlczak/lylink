@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Edit Series Lyrics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.4/css/bulma.min.css" />
+    <script type="module">
+        import { JellyfinEdit } from '/dist/jellyfinEdit.js';
+        let address = "{{ address }}";
+        let token = "{{ token }}";
+        JellyfinEdit.setUp(address, token);
+    </script>
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-3">Edit Lyrics</h1>
+
+            <div class="columns">
+                <div class="column is-two-thirds">
+                    <form method="post" id="lyricsForm">
+                        <input type="hidden" name="series_id" value="{{ series.id }}">
+                        <input type="hidden" name="lyrics_id" value="{{ lyrics_id }}">
+
+                        <div class="field">
+                            <label class="label">Series</label>
+                            <div class="control">
+                                <input class="input" type="text" disabled name="series_title" id="series_title"
+                                    value="{{ series.title }}">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Season</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="season" name="season" id="season">
+                                        <!-- <option disabled>No episodes available</option> -->
+                                    </select>
+                                </div>
+                            </div>
+                            <p class="help">Lyrics season.</p>
+                        </div>
+
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label">First Episode</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select name="first_episode" id="firstEpisodeSelect">
+                                                {% for ep in series.episodes %}
+                                                <option value="{{ ep.id }}"
+                                                    {% if ep.id == first_episode %}selected{% endif %}>
+                                                    S{{ ep.seasonIndex|default('?') }}E{{ ep.episodeIndex|default(loop.index) }}{% if ep.name is defined and ep.name %}
+                                                    — {{ ep.name }}{% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option disabled>No episodes available</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">Episode to start showing these lyrics.</p>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label">Last Episode</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select name="last_episode" id="lastEpisodeSelect">
+                                                {% for ep in series.episodes %}
+                                                <option value="{{ ep.id }}"
+                                                    {% if ep.id == last_episode %}selected{% endif %}>
+                                                    S{{ ep.seasonIndex|default('?') }}E{{ ep.episodeIndex|default(loop.index) }}{% if ep.name is defined and ep.name %}
+                                                    — {{ ep.name }}{% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option disabled>No episodes available</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">Episode to stop showing these lyrics (inclusive).</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="field">
+                            <label class="label">Lyrics</label>
+                            <div class="control">
+                                <textarea id="lyricsInput" class="textarea" name="lyrics"
+                                    rows="12">{{ lyrics }}</textarea>
+                            </div>
+                            <p class="help" id="stats">Lines: 0 · Words: 0</p>
+                        </div>
+
+                        <div class="field is-grouped">
+                            <div class="control">
+                                <button class="button is-primary" id="saveBtn">Save</button>
+                            </div>
+                            <div class="control">
+                                <button class="button is-light" type="button" id="cancelBtn"
+                                    onclick="history.back()">Cancel</button>
+                            </div>
+                            <div class="control">
+                                <button class="button is-info" type="button" id="previewToggle">Toggle Live
+                                    Preview</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="column">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-4by3">
+                                <img id="posterImage" src="{{ series.imageUrl }}" alt="{{ series.title }} poster">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <p class="title is-5" id="previewTitle">{{ series.title }}</p>
+                            <p class="subtitle is-6" id="previewMeta">
+                                Episodes: <span id="previewEpisodeRange">{{ first_episode ?: '—' }} —
+                                    {{ last_episode ?: '—' }}</span>
+                            </p>
+                            <p class="subtitle is-6" id="previewSeasons">
+                                Seasons:
+                                {% if selected_seasons|length > 0 %}
+                                {{ selected_seasons|join(', ') }}
+                                {% else %}
+                                All
+                                {% endif %}
+                            </p>
+                            <div id="livePreview" class="content" style="white-space:pre-wrap;">{{ lyrics }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var lyricsInput = document.getElementById('lyricsInput');
+            var livePreview = document.getElementById('livePreview');
+            var stats = document.getElementById('stats');
+            var cancelBtn = document.getElementById('cancelBtn');
+            var previewToggle = document.getElementById('previewToggle');
+            var previewTitle = document.getElementById('previewTitle');
+            var previewEpisodeRange = document.getElementById('previewEpisodeRange');
+            var previewSeasons = document.getElementById('previewSeasons');
+            var firstSelect = document.getElementById('firstEpisodeSelect');
+            var lastSelect = document.getElementById('lastEpisodeSelect');
+            var form = document.getElementById('lyricsForm');
+
+            function updatePreview() {
+                livePreview.textContent = lyricsInput.value;
+                var lines = lyricsInput.value.split(/\n/).filter(function (l) { return l.length > 0; }).length;
+                var words = lyricsInput.value.trim().length ? lyricsInput.value.trim().split(/\s+/).length : 0;
+                stats.textContent = 'Lines: ' + lines + ' · Words: ' + words;
+            }
+
+            function updateEpisodePreview() {
+                var firstText = firstSelect.options[firstSelect.selectedIndex] ? firstSelect.options[firstSelect.selectedIndex].text : '—';
+                var lastText = lastSelect.options[lastSelect.selectedIndex] ? lastSelect.options[lastSelect.selectedIndex].text : '—';
+                previewEpisodeRange.textContent = firstText + ' — ' + lastText;
+            }
+
+            function ensureOrder() {
+                if (firstSelect.selectedIndex > lastSelect.selectedIndex) {
+                    lastSelect.selectedIndex = firstSelect.selectedIndex;
+                    updateEpisodePreview();
+                }
+            }
+
+            lyricsInput.addEventListener('input', updatePreview);
+            firstSelect.addEventListener('change', function () { updateEpisodePreview(); ensureOrder(); });
+            lastSelect.addEventListener('change', function () { updateEpisodePreview(); ensureOrder(); });
+
+            cancelBtn.addEventListener('click', function () {
+                lyricsInput.value = originalLyrics;
+                updatePreview();
+            });
+
+            previewToggle.addEventListener('click', function () {
+                livePreview.parentElement.parentElement.classList.toggle('is-hidden');
+            });
+
+            document.getElementById('selectAllSeasons').addEventListener('click', function () {
+                document.querySelectorAll('input[name="seasons[]"]').forEach(function (cb) { cb.checked = true; });
+                updateSeasonsPreview();
+            });
+
+            document.getElementById('clearSeasons').addEventListener('click', function () {
+                document.querySelectorAll('input[name="seasons[]"]').forEach(function (cb) { cb.checked = false; });
+                updateSeasonsPreview();
+            });
+
+            document.querySelectorAll('input[name="seasons[]"]').forEach(function (cb) {
+                cb.addEventListener('change', updateSeasonsPreview);
+            });
+
+            function updateSeasonsPreview() {
+                var checked = Array.prototype.slice.call(document.querySelectorAll('input[name="seasons[]"]:checked')).map(function (c) { return c.value; });
+                previewSeasons.textContent = 'Seasons: ' + (checked.length ? checked.join(', ') : 'All');
+            }
+
+            form.addEventListener('submit', function (e) {
+                if (firstSelect.selectedIndex > lastSelect.selectedIndex) {
+                    e.preventDefault();
+                    alert('Last episode must be the same or after the first episode.');
+                }
+            });
+
+            updatePreview();
+            updateEpisodePreview();
+            updateSeasonsPreview();
+        });
+    </script> -->
+</body>
+
+</html>

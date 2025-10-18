@@ -3,6 +3,8 @@
 namespace Lylink\Routes;
 
 use Closure;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Lylink\Auth\AuthSession;
 use Lylink\Data\CurrentSong;
 use Lylink\Data\LyricsData;
@@ -28,6 +30,8 @@ class LyricsRoute extends Router implements Route
             SimpleRouter::post('/spotify', [self::class, 'update']);
 
             SimpleRouter::get('/jellyfin', [self::class, 'jellyfinLyrics']);
+            SimpleRouter::get('/jellyfin/edit', [self::class, 'jellyfinEdit']);
+            SimpleRouter::post('/jellyfin/edit', [self::class, 'jellyfinUpdate']);
         };
     }
 
@@ -71,12 +75,103 @@ class LyricsRoute extends Router implements Route
         if ($settings->jellyfin_connected) {
             $address = $settings->jellyfin_server;
             $token = $settings->jellyfin_token;
+
+            if (isset($_GET["show_id"]) && isset($_GET["season_index"]) && isset($_GET["ep_index"])) {
+                $showId = $_GET["show_id"];
+                $seasonIndex = $_GET["season_index"];
+                $episodeIndex = $_GET["ep_index"];
+
+                $em = DoctrineRegistry::get();
+                $qb = $em->getRepository(Lyrics::class)->createQueryBuilder("l");
+
+                $qb->where("l.jellyfinShowId = :showId");
+                $qb->andWhere("l.jellyfinSeasonNumber = :seasonNumber");
+                $qb->andWhere("l.jellyfinStartEpisodeNumber <= :episodeNumber");
+                $qb->andWhere("l.jellyfinEndEpisodeNumber >= :episodeNumber");
+                $qb->setParameters(new ArrayCollection([new Parameter("showId", $showId), new Parameter("seasonNumber", $seasonIndex), new Parameter("episodeNumber", $episodeIndex)]));
+                $qb->setMaxResults(1);
+
+                /**
+                 * @var Lyrics|null $lyrics
+                 */
+                $lyrics = $qb->getQuery()->getOneOrNullResult();
+                if ($lyrics != null) {
+                    $lyricsData->lyrics = $lyrics->lyrics;
+                    $lyricsData->id = $showId;
+                }
+            }
+
         } else {
             header('Location: ' . $_ENV['BASE_DOMAIN'] . '/login');
             die();
         }
 
         return self::$twig->load('lyrics/jellyfin.twig')->render(["song" => $lyricsData, "address" => $address, "token" => $token]);
+    }
+
+    public static function jellyfinEdit(): string
+    {
+        $settings = Settings::getSettings(AuthSession::get()?->getUser()?->getId() ?? 0);
+
+        if ($settings->jellyfin_connected) {
+            $address = $settings->jellyfin_server;
+            $token = $settings->jellyfin_token;
+        } else {
+            header('Location: ' . $_ENV['BASE_DOMAIN'] . '/login');
+            die();
+        }
+
+        return self::$twig->load('lyrics/jellyfin_edit.twig')->render([
+            "address" => $address,
+            "token" => $token
+        ]);
+    }
+
+    public static function jellyfinUpdate(): string
+    {
+        $input = file_get_contents('php://input');
+        if ($input === false || $input === '') {
+            http_response_code(400);
+            return '';
+        }
+
+        /**
+         * @var array{showId:string,seasonNumber:int,firstEpisode:int,lastEpisode:int,lyrics:string}
+         */
+        $json = json_decode($input, true);
+
+        $showId = $json['showId'];
+        $seasonNumber = $json['seasonNumber'];
+        $firstEpisode = $json['firstEpisode'];
+        $lastEpisode = $json['lastEpisode'];
+        $lyricsText = $json['lyrics'];
+
+        if (AuthSession::get()?->isAuthorized()) {
+            $entityManager = DoctrineRegistry::get();
+            /**
+             * @var Lyrics|null
+             */
+            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy([
+                'jellyfinShowId' => $showId,
+                'jellyfinSeasonNumber' => $seasonNumber,
+                'jellyfinStartEpisodeNumber' => $firstEpisode,
+                'jellyfinEndEpisodeNumber' => $lastEpisode
+            ]);
+            if ($lyrics == null) {
+                $lyrics = new Lyrics();
+            }
+            $lyrics->jellyfinShowId = $showId;
+            $lyrics->jellyfinSeasonNumber = $seasonNumber;
+            $lyrics->jellyfinStartEpisodeNumber = $firstEpisode;
+            $lyrics->jellyfinEndEpisodeNumber = $lastEpisode;
+            $lyrics->lyrics = $lyricsText;
+            $entityManager->persist($lyrics);
+            $entityManager->flush();
+
+            return "ok";
+        }
+        http_response_code(500);
+        return "";
     }
 
     public function spotifyLyrics(): void
@@ -146,7 +241,7 @@ class LyricsRoute extends Router implements Route
             /**
              * @var Lyrics|null
              */
-            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $id]);
+            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotifyId' => $id]);
 
             if ($lyrics == null) {
                 $lyrics = new Lyrics();

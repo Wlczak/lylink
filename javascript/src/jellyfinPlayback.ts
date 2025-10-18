@@ -1,3 +1,5 @@
+import { JellyfinApi } from "./jellyfinApi.js";
+
 export class JellyfinPlayback {
     playbackInterval: number = 0;
     refreshInterval: number = 0;
@@ -19,7 +21,7 @@ export class JellyfinPlayback {
     }
 
     getPlaybackStatus(address: string, token: string) {
-        fetch(address + "/getPlaybackInfo", { method: "POST", body: JSON.stringify({ token: token }) })
+        JellyfinApi.getPlaybackInfo(address, token)
             .then((response) => response.json())
             .then((data: PlaybackInfo[] | null | undefined) => {
                 if (data === null || data === undefined) {
@@ -34,11 +36,49 @@ export class JellyfinPlayback {
 
                 const item = data[0];
                 const id = new URLSearchParams(window.location.search).get("ep_id");
-                if (id != item.PlayState.MediaSourceId) {
-                    window.location.search = "?ep_id=" + item.PlayState.MediaSourceId;
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 100);
+                const episodeIndex = new URLSearchParams(window.location.search).get("ep_index");
+                const seasonIndex = new URLSearchParams(window.location.search).get("season_index");
+                const showId = new URLSearchParams(window.location.search).get("show_id");
+
+                if (
+                    id != item.PlayState.MediaSourceId ||
+                    episodeIndex == null ||
+                    episodeIndex == undefined ||
+                    episodeIndex == "" ||
+                    seasonIndex == null ||
+                    seasonIndex == undefined ||
+                    seasonIndex == "" ||
+                    showId == null ||
+                    showId == undefined ||
+                    showId == ""
+                ) {
+                    JellyfinApi.getEpisodeWithParents(address, token, item.PlayState.MediaSourceId).then(
+                        (response) => {
+                            if (response.ok) {
+                                response.json().then((data: EpisodeWithParentsInfo | null | undefined) => {
+                                    if (data != null && data != undefined) {
+                                        const episodeIndex = data.IndexNumber;
+                                        const seasonIndex = data.ParentIndexNumber;
+
+                                        window.location.search =
+                                            "?ep_id=" +
+                                            item.PlayState.MediaSourceId +
+                                            "&ep_index=" +
+                                            episodeIndex +
+                                            "&season_index=" +
+                                            seasonIndex +
+                                            "&show_id=" +
+                                            data.SeriesId;
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 100);
+                                    }
+                                });
+                            } else {
+                                alert("Failed to get episode info");
+                            }
+                        }
+                    );
                 } else {
                     const progressBar = document.getElementById("progress-bar") as HTMLProgressElement;
                     const progressTime = document.getElementById("progress-time") as HTMLSpanElement;
@@ -117,18 +157,19 @@ export class JellyfinPlayback {
             placeholder();
             return;
         }
-        fetch(address + "/Item/" + mediaId, { method: "POST", body: JSON.stringify({ token: token }) })
+        JellyfinApi.getEpisodeWithParents(address, token, mediaId)
             .then((response) => response.json())
-            .then((data: MediaInfo | null | undefined) => {
+            .then((data: EpisodeWithParentsInfo | null | undefined) => {
                 if (data === null || data === undefined) {
                     placeholder();
                     return;
                 }
                 this.updateMediainfo(data);
+                this.enableEdit(data.Id, data.SeasonId, data.SeriesId);
             });
     }
 
-    updateMediainfo(info: MediaInfo) {
+    updateMediainfo(info: EpisodeWithParentsInfo) {
         const fullName =
             info.SeriesName +
             " - " +
@@ -139,5 +180,13 @@ export class JellyfinPlayback {
             " - " +
             info.Name;
         this.changeTitle(fullName);
+    }
+
+    enableEdit(epId: string, seasonId: string, showId: string) {
+        const editContainer = document.getElementById("edit-container") as HTMLDivElement;
+        const editBtn = document.getElementById("edit-btn") as HTMLAnchorElement;
+        editBtn.href =
+            "/lyrics/jellyfin/edit?ep_id=" + epId + "&season_id=" + seasonId + "&show_id=" + showId;
+        editContainer.hidden = false;
     }
 }

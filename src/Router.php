@@ -17,7 +17,6 @@ use Lylink\Routes\Integrations\Api\IntegrationApi;
 use Lylink\Routes\Integrations\Jellyfin;
 use Lylink\Routes\LyricsRoute;
 use Pecee\SimpleRouter\SimpleRouter;
-use SensitiveParameter;
 use SpotifyWebAPI\Session;
 use SpotifyWebAPI\SpotifyWebAPI;
 
@@ -41,7 +40,7 @@ class Router
         ## Authenticated routes ##
         SimpleRouter::group(['middleware' => \Lylink\Middleware\AuthMiddleware::class], function () {
             SimpleRouter::partialGroup('/lyrics', LyricsRoute::setup());
-            SimpleRouter::get('/edit', [self::class, 'edit']);
+            // SimpleRouter::get('/edit', [self::class, 'edit']);
             SimpleRouter::get('/settings', [self::class, 'settings']);
             SimpleRouter::partialGroup('/integrations', function () {
                 SimpleRouter::partialGroup('/jellyfin', Jellyfin::setup());
@@ -77,7 +76,7 @@ class Router
             }
         });
 
-        SimpleRouter::post('/edit/save', [self::class, 'update']);
+        // SimpleRouter::post('/edit/save', [self::class, 'update']);
 
         SimpleRouter::start();
     }
@@ -186,7 +185,7 @@ class Router
             return self::$twig->load("verify.twig")->render(["success" => true]);
         } else {
             $errors = ["Incorrect verification code"];
-            return self::$twig->load("verify.twig")->render(["success" => false,"errors"=>$errors]);
+            return self::$twig->load("verify.twig")->render(["success" => false, "errors" => $errors]);
         }
 
     }
@@ -210,53 +209,53 @@ class Router
         return self::$twig->load('settings.twig')->render(['user' => $user, 'settings' => Settings::getSettings($id)]);
     }
 
-    function edit(): void
-    {
-        /**
-         * @var Session
-         */
-        $session = $_SESSION['spotify_session'];
-        $trackId = $_GET['id'];
+    // function edit(): void
+    // {
+    //     /**
+    //      * @var Session
+    //      */
+    //     $session = $_SESSION['spotify_session'];
+    //     $trackId = $_GET['id'];
 
-        $api = new SpotifyWebAPI();
-        $api->setAccessToken($session->getAccessToken());
+    //     $api = new SpotifyWebAPI();
+    //     $api->setAccessToken($session->getAccessToken());
 
-        /**
-         * @var Track
-         */
-        $track = $api->getTrack($trackId);
+    //     /**
+    //      * @var Track
+    //      */
+    //     $track = $api->getTrack($trackId);
 
-        $template = self::$twig->load('lyrics/edit.twig');
+    //     $template = self::$twig->load('lyrics/spotify_edit.twig');
 
-        $em = DoctrineRegistry::get();
+    //     $em = DoctrineRegistry::get();
 
-        /**
-         * @var Lyrics|null
-         */
-        $lyrics = $em->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $trackId]);
-        if ($lyrics == null) {
-            $lyrics = new Lyrics();
-        }
+    //     /**
+    //      * @var Lyrics|null
+    //      */
+    //     $lyrics = $em->getRepository(Lyrics::class)->findOneBy(['spotifyId' => $trackId]);
+    //     if ($lyrics == null) {
+    //         $lyrics = new Lyrics();
+    //     }
 
-        echo $template->render([
-            'song' => [
-                'name' => $track->name,
-                'artist' => $track->artists[0]->name,
-                'imageUrl' => $track->album->images[0]->url,
-                'duration' => $track->duration_ms,
-                'id' => $track->id
-            ],
-            'lyrics' => $lyrics->lyrics
-        ]);
-    }
+    //     echo $template->render([
+    //         'song' => [
+    //             'name' => $track->name,
+    //             'artist' => $track->artists[0]->name,
+    //             'imageUrl' => $track->album->images[0]->url,
+    //             'duration' => $track->duration_ms,
+    //             'id' => $track->id
+    //         ],
+    //         'lyrics' => $lyrics->lyrics
+    //     ]);
+    // }
 
     function update(): void
     {
         $entityManager = DoctrineRegistry::get();
-        $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $_POST['id']]);
+        $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotifyId' => $_POST['id']]);
         if ($lyrics == null) {
             $lyrics = new Lyrics();
-            $lyrics->spotify_id = $_POST['id'];
+            $lyrics->spotifyId = $_POST['id'];
         }
         $lyrics->lyrics = $_POST['lyrics'];
         $entityManager->persist($lyrics);
