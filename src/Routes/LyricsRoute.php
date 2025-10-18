@@ -131,6 +131,7 @@ class LyricsRoute extends Router implements Route
             $lyrics->lyrics = $lyricsText;
             $entityManager->persist($lyrics);
             $entityManager->flush();
+
             return "ok";
         }
         http_response_code(500);

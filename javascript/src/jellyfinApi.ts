@@ -56,7 +56,16 @@ export class JellyfinApi {
         lastEpisode: number,
         lyrics: string
     ) {
-        console.log(
-            `showId: ${showId}, seasonNumber: ${seasonNumber}, firstEpisode: ${firstEpisode}, lastEpisode: ${lastEpisode}, lyrics: ${lyrics}`)
+        console.log(JSON.stringify({ showId, seasonNumber, firstEpisode, lastEpisode, lyrics }));
+        fetch("/lyrics/jellyfin/edit", {
+            method: "POST",
+            body: JSON.stringify({ showId, seasonNumber, firstEpisode, lastEpisode, lyrics }),
+        }).then((res) => {
+            if (res.ok) {
+                window.location.replace("/lyrics/jellyfin");
+            } else {
+                alert("Failed to save lyrics");
+            }
+        });
     }
 }
