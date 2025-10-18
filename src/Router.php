@@ -232,7 +232,7 @@ class Router
     //     /**
     //      * @var Lyrics|null
     //      */
-    //     $lyrics = $em->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $trackId]);
+    //     $lyrics = $em->getRepository(Lyrics::class)->findOneBy(['spotifyId' => $trackId]);
     //     if ($lyrics == null) {
     //         $lyrics = new Lyrics();
     //     }
@@ -252,7 +252,7 @@ class Router
     function update(): void
     {
         $entityManager = DoctrineRegistry::get();
-        $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $_POST['id']]);
+        $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotifyId' => $_POST['id']]);
         if ($lyrics == null) {
             $lyrics = new Lyrics();
             $lyrics->spotifyId = $_POST['id'];

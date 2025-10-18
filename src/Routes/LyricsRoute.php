@@ -241,7 +241,7 @@ class LyricsRoute extends Router implements Route
             /**
              * @var Lyrics|null
              */
-            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotify_id' => $id]);
+            $lyrics = $entityManager->getRepository(Lyrics::class)->findOneBy(['spotifyId' => $id]);
 
             if ($lyrics == null) {
                 $lyrics = new Lyrics();
