@@ -40,12 +40,14 @@
                 <p><strong class="has-text-danger">Code {{ code|default('') }}</strong> —
                     <strong>{{ message|default('Something has gone wrong') }}</strong>
                 </p>
+                {%if trace is defined %}
                 <p class="meta">in <code>{{ file|default('n/a') }}</code> on line
                     <strong>{{ line|default('?') }}</strong>
                 </p>
+                {% endif %}
 
                 <hr>
-
+                {% if trace is defined %}
                 <h2 class="subtitle is-6">Stack trace (most recent first)</h2>
 
                 <ol style="padding-left: 2.5rem;">
@@ -70,6 +72,10 @@
                     <li class="small-muted">No stack trace available.</li>
                     {% endfor %}
                 </ol>
+                {%else%}
+
+                <p>This server is in production mode if you've encountered this issue please create a <a href="https://github.com/Wlczak/lylink/issues">GitHub issue</a>. And copy the error code alongside the error ray.</p>
+                {% endif %}
             </div>
         </div>
     </section>
