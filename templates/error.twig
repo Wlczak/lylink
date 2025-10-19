@@ -40,7 +40,10 @@
                 <p><strong class="has-text-danger">Code {{ code|default('') }}</strong> —
                     <strong>{{ message|default('Something has gone wrong') }}</strong>
                 </p>
-                {%if trace is defined %}
+                {% if ray is defined %}
+                <p class="meta">Error ray: <code>{{ ray }}</code></p>
+                {% endif %}
+                {% if trace is defined %}
                 <p class="meta">in <code>{{ file|default('n/a') }}</code> on line
                     <strong>{{ line|default('?') }}</strong>
                 </p>
@@ -72,9 +75,11 @@
                     <li class="small-muted">No stack trace available.</li>
                     {% endfor %}
                 </ol>
-                {%else%}
-
-                <p>This server is in production mode if you've encountered this issue please create a <a href="https://github.com/Wlczak/lylink/issues">GitHub issue</a>. And copy the error code alongside the error ray.</p>
+                {% else %}
+                <p>This server is in production mode, if you've encountered this issue please create a <a
+                        href="https://github.com/Wlczak/lylink/issues">GitHub issue</a>. And copy the error code
+                    with the error ray alongside a simple description of what you were doing before the error or a way
+                    to recreate the error.</p>
                 {% endif %}
             </div>
         </div>

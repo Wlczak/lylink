@@ -4,6 +4,9 @@ require_once __DIR__ . '/../bootstrap.php';
 
 use Dotenv\Dotenv;
 use Lylink\Router;
+use Monolog\Handler\StreamHandler;
+use Monolog\Level;
+use Monolog\Logger;
 
 session_start();
 session_regenerate_id();
@@ -38,15 +41,21 @@ try {
             'debug' => $devMode
         ]);
 
+        $errorRay = uniqid();
+
+        $log = new Logger('mainLogger');
+        $log->pushHandler(new StreamHandler('../logs.log', Level::Info));
+        $log->addRecord(Level::Error, $e->getMessage(), ['ray' => $errorRay, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine(), 'trace' => $e->getTraceAsString()]);
+
         if ($e->getMessage() == "Check settings on developer.spotify.com/dashboard, the user may not be registered.") {
             echo $template = self::$twig->load('whitelist.twig')->render();
             die();
         }
 
         if ($devMode) {
-            echo $twig->load('error.twig')->render(['message' => $e->getMessage(), "code" => $e->getCode(), "line" => $e->getLine(), "file" => $e->getFile(), "trace" => $e->getTrace()]);
+            echo $twig->load('error.twig')->render(['message' => $e->getMessage(), "code" => $e->getCode(), "line" => $e->getLine(), "file" => $e->getFile(), "trace" => $e->getTrace(), 'ray' => $errorRay]);
         } else {
-            echo $twig->load('error.twig')->render(['message' => "Something has gone very wrong", "code" => $e->getCode()]);
+            echo $twig->load('error.twig')->render(['message' => "Oops, something has gone wrong...", "code" => $e->getCode(), 'ray' => $errorRay]);
         }
 
     } catch (Exception $e) {
