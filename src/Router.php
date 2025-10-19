@@ -61,16 +61,6 @@ class Router
             return "pong";
         });
         SimpleRouter::get('/info', [self::class, 'info']);
-        SimpleRouter::error(function ($request, $e) {
-            http_response_code(404);
-
-            if ($e->getMessage() == "Check settings on developer.spotify.com/dashboard, the user may not be registered.") {
-                echo $template = self::$twig->load('whitelist.twig')->render();
-                die();
-            } else {
-                throw $e;
-            }
-        });
 
         // SimpleRouter::post('/edit/save', [self::class, 'update']);
 

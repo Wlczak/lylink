@@ -37,6 +37,12 @@ try {
             'cache' => __DIR__ . '/../cache',
             'debug' => $devMode
         ]);
+
+        if ($e->getMessage() == "Check settings on developer.spotify.com/dashboard, the user may not be registered.") {
+            echo $template = self::$twig->load('whitelist.twig')->render();
+            die();
+        }
+
         if ($devMode) {
             echo $twig->load('error.twig')->render(['message' => $e->getMessage(), "code" => $e->getCode(), "line" => $e->getLine(), "file" => $e->getFile(), "trace" => $e->getTrace()]);
         } else {
@@ -50,3 +56,13 @@ try {
         }
     }
 }
+
+// SimpleRouter::error(function ($request, $e) {
+
+//     if ($e->getMessage() == "Check settings on developer.spotify.com/dashboard, the user may not be registered.") {
+//         echo $template = self::$twig->load('whitelist.twig')->render();
+//         die();
+//     } else {
+//         throw $e;
+//     }
+// });
