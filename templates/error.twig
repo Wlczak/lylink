@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Error {{ code|default('') }} — Exception</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.4/css/bulma.min.css">
+    <style>
+        .trace-pre {
+            background: #0b1220;
+            color: #e6eef8;
+            padding: 0.6rem;
+            border-radius: 6px;
+            font-family: ui-monospace, monospace;
+            font-size: 13px;
+            overflow: auto;
+        }
+
+        .meta {
+            color: #4b5563;
+        }
+
+        .frame {
+            margin-bottom: 0.75rem;
+        }
+
+        .small-muted {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <div class="box">
+                <h1 class="title is-4">Unhandled Exception</h1>
+                <p><strong class="has-text-danger">Code {{ code|default('') }}</strong> —
+                    <strong>{{ message|default('Something has gone wrong') }}</strong>
+                </p>
+                {% if ray is defined %}
+                <p class="meta">Error ray: <code>{{ ray }}</code></p>
+                {% endif %}
+                {% if trace is defined %}
+                <p class="meta">in <code>{{ file|default('n/a') }}</code> on line
+                    <strong>{{ line|default('?') }}</strong>
+                </p>
+                {% endif %}
+
+                <hr>
+                {% if trace is defined %}
+                <h2 class="subtitle is-6">Stack trace (most recent first)</h2>
+
+                <ol style="padding-left: 2.5rem;">
+                    {% for frame in trace|default([]) %}
+                    <li class="frame">
+                        <div>
+                            <strong>#{{ loop.index0 }}</strong>
+                            <strong>{{ frame.class|default('') }}{{ frame.type|default('') }}{{ frame.function|default('?') }}()</strong>
+                        </div>
+                        {% if frame.file is defined %}
+                        <div class="small-muted">{{ frame.file }}:{{ frame.line|default('?') }}</div>
+                        {% endif %}
+                        {% if (frame.args|default([]))|length %}
+                        <details>
+                            <summary class="small-muted">Arguments ({{ (frame.args|default([]))|length }})</summary>
+                            <pre
+                                class="trace-pre">{{ (frame.args|default([]))|json_encode(constant('JSON_PRETTY_PRINT'))|default('[]')|e('html') }}</pre>
+                        </details>
+                        {% endif %}
+                    </li>
+                    {% else %}
+                    <li class="small-muted">No stack trace available.</li>
+                    {% endfor %}
+                </ol>
+                {% else %}
+                <p>This server is in production mode, if you've encountered this issue please create a <a
+                        href="https://github.com/Wlczak/lylink/issues">GitHub issue</a>. And copy the error code
+                    with the error ray alongside a simple description of what you were doing before the error or a way
+                    to recreate the error.</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
