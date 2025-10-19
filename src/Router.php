@@ -3,12 +3,10 @@ declare (strict_types = 1);
 
 namespace Lylink;
 
-use Dotenv\Dotenv;
 use Exception;
 use Lylink\Auth\AuthSession;
 use Lylink\Auth\DefaultAuth;
 use Lylink\Interfaces\Datatypes\PlaybackInfo;
-use Lylink\Interfaces\Datatypes\Track;
 use Lylink\Mail\Mailer;
 use Lylink\Models\Lyrics;
 use Lylink\Models\Settings;
@@ -23,14 +21,12 @@ use SpotifyWebAPI\SpotifyWebAPI;
 class Router
 {
     public static \Twig\Environment $twig;
-    public static function handle(): void
+    public static function handle(bool $devMode): void
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../config');
-        $dotenv->safeLoad();
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
         self::$twig = new \Twig\Environment($loader, [
             'cache' => __DIR__ . '/../cache',
-            'debug' => true
+            'debug' => $devMode
         ]);
 
         ## User facing routes ##
