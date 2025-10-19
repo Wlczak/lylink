@@ -13,7 +13,7 @@
         let token = "{{ token }}";
         jelly.setUp(address, token);
     </script>
-    <script type="module" src="/dist/jellyfin.js"></script>
+    <script type="module" src="/dist/jellyfinPlayback.js"></script>
 </head>
 
 <body>
@@ -51,7 +51,7 @@
                     <div class="content">
                         <h3 class="title is-6">Lyrics</h3>
                         <div class="content">
-                            {% for line in lyrics|split("\n") %}
+                            {% for line in song.lyrics|split("\n") %}
                             {% if line|trim is empty %}
                             <line style="display: block; height: 1.33em;"></line>
                             {% else %}
@@ -64,10 +64,10 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="content">
-                        <a class="button is-link" href="/edit?id={{ song.id }}">Edit</a>
-                    </div>
                     {% endif %}
+                    <div id="edit-container" class="content" hidden>
+                        <a id="edit-btn" class="button is-link" href="/edit?id={{ song.id }}">Edit</a>
+                    </div>
                 </div>
             </div>
         </div>
