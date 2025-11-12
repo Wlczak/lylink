@@ -20,8 +20,7 @@ export class JellyfinApi {
         });
         if (res.ok) {
             return res.json();
-        }
-        else{
+        } else {
             throw new Error("Failed to get episode info");
         }
     }

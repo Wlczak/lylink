@@ -130,7 +130,7 @@ class LyricsRoute extends Router implements Route
         }
         return self::$twig->load('lyrics/jellyfin_edit_list.twig')->render([
             "address" => $address,
-            "token" => $token,
+            "token" => $token
         ]);
     }
 

@@ -27,7 +27,14 @@ export class JellyfinEdit {
     static async setUpList(address: string, token: string) {
         const episodeId = new URLSearchParams(window.location.search).get("ep_id");
         const seasonId = new URLSearchParams(window.location.search).get("season_id");
-        if (episodeId == null || episodeId == undefined || episodeId == "" || seasonId == null || seasonId == undefined || seasonId == "") {
+        if (
+            episodeId == null ||
+            episodeId == undefined ||
+            episodeId == "" ||
+            seasonId == null ||
+            seasonId == undefined ||
+            seasonId == ""
+        ) {
             console.error("No mediaId found");
             window.location.replace("/lyrics/jellyfin");
             return;

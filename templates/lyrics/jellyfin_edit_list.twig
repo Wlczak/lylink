@@ -97,10 +97,12 @@
                         <div class="card-content">
                             <p class="title is-5">Episode</p>
                             <p class="subtitle is-6">
-                                <span id="episode-season-info">S{{ episode.seasonIndex|default('?') }}E{{ episode.episodeIndex|default('?') }}</span>
+                                <span
+                                    id="episode-season-info">S{{ episode.seasonIndex|default('?') }}E{{ episode.episodeIndex|default('?') }}</span>
                             </p>
                             <figure class="image">
-                                <img id="episode-poster" src="{{ series.imageUrl }}" alt="{{ series.title }} poster" style="border-radius: 12px; width: 100%; height: auto;">
+                                <img id="episode-poster" src="{{ series.imageUrl }}" alt="{{ series.title }} poster"
+                                    style="border-radius: 12px; width: 100%; height: auto;">
                             </figure>
                             <div class="mt-4">
                                 <a class="button is-fullwidth is-success"
