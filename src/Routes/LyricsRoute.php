@@ -219,7 +219,7 @@ class LyricsRoute extends Router implements Route
         }
 
         /**
-         * @var array{showId:string,seasonNumber:int,firstEpisode:int,lastEpisode:int,lyrics:string}
+         * @var array{showId:string,seasonNumber:int,firstEpisode:int,lastEpisode:int,lyrics:string,lyricsName:string}
          */
         $json = json_decode($input, true);
 
@@ -228,6 +228,7 @@ class LyricsRoute extends Router implements Route
         $firstEpisode = $json['firstEpisode'];
         $lastEpisode = $json['lastEpisode'];
         $lyricsText = $json['lyrics'];
+        $lyricsName = $json['lyricsName'];
 
         if (AuthSession::get()?->isAuthorized()) {
             $entityManager = DoctrineRegistry::get();
@@ -248,6 +249,7 @@ class LyricsRoute extends Router implements Route
             $lyrics->jellyfinStartEpisodeNumber = $firstEpisode;
             $lyrics->jellyfinEndEpisodeNumber = $lastEpisode;
             $lyrics->lyrics = $lyricsText;
+            $lyrics->jellyfinLyricsName = $lyricsName;
             $entityManager->persist($lyrics);
             $entityManager->flush();
 

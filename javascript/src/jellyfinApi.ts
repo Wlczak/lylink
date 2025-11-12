@@ -58,11 +58,12 @@ export class JellyfinApi {
         seasonNumber: number,
         firstEpisode: number,
         lastEpisode: number,
+        lyricsName: string,
         lyrics: string
     ) {
-        fetch("/lyrics/jellyfin/edit", {
+        fetch("/lyrics/jellyfin/save", {
             method: "POST",
-            body: JSON.stringify({ showId, seasonNumber, firstEpisode, lastEpisode, lyrics }),
+            body: JSON.stringify({ showId, seasonNumber, firstEpisode, lastEpisode, lyrics, lyricsName }),
         }).then((res) => {
             if (res.ok) {
                 window.location.replace("/lyrics/jellyfin");
