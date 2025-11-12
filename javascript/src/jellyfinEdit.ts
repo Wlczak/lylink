@@ -118,10 +118,12 @@ export class JellyfinEdit {
             seasonsSelect.add(option);
         });
 
-        // const activeSeason = document.getElementById(
-        //     "s-" + episodeInfo.ParentIndexNumber.toString()
-        // ) as HTMLOptionElement;
-        // activeSeason.selected = true;
+        if (seasonIndex == null || seasonIndex == "") {
+            const activeSeason = document.getElementById(
+                "s-" + episodeInfo.ParentIndexNumber.toString()
+            ) as HTMLOptionElement;
+            activeSeason.selected = true;
+        }
 
         this.setEpisodeSelects(
             seasonsSelect.selectedOptions[0].innerText,

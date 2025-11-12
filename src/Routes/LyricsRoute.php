@@ -199,7 +199,6 @@ class LyricsRoute extends Router implements Route
                 $lastEpisodeIndex = $lyricsObj->jellyfinEndEpisodeNumber;
             }
         }
-        var_dump($lyrics);
         return self::$twig->load('lyrics/jellyfin_edit.twig')->render([
             "address" => $address,
             "token" => $token,
