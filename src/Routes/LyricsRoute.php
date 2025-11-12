@@ -129,6 +129,7 @@ class LyricsRoute extends Router implements Route
             die();
         }
 
+        $episodeId = $_GET["ep_id"];
         $showId = $_GET["show_id"];
         $seasonIndex = $_GET["season_index"];
         $episodeIndex = $_GET["ep_index"];
@@ -150,8 +151,8 @@ class LyricsRoute extends Router implements Route
         return self::$twig->load('lyrics/jellyfin_edit_list.twig')->render([
             "address" => $address,
             "token" => $token,
-            "lyrics_list" => $lyricsList
-
+            "lyrics_list" => $lyricsList,
+            "ep_id" => $episodeId
         ]);
     }
 
